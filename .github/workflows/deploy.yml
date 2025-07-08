@@ -81,7 +81,6 @@ jobs:
           fetch-depth: 0 # Fetch full history for proper git operations
 
       - name: Install Heroku CLI
-        shell: bash
         run: |
           # Install Heroku CLI using the official method
           curl https://cli-assets.heroku.com/install.sh | sh
@@ -101,7 +100,7 @@ jobs:
           # Verify authentication works
           heroku auth:whoami
         env:
-          PATH: "/usr/local/bin:$PATH"
+          PATH: "/usr/local/bin:${{ env.PATH }}"
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Deploy to Heroku
@@ -114,7 +113,7 @@ jobs:
           # Deploy to Heroku
           git push heroku HEAD:main --force
         env:
-          PATH: "/usr/local/bin:$PATH"
+          PATH: "/usr/local/bin:${{ env.PATH }}"
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Run database migrations (if needed)
@@ -126,7 +125,7 @@ jobs:
           fi
         continue-on-error: true
         env:
-          PATH: "/usr/local/bin:$PATH"
+          PATH: "/usr/local/bin:${{ env.PATH }}"
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Health check
@@ -146,5 +145,5 @@ jobs:
             exit 1
           fi
         env:
-          PATH: "/usr/local/bin:$PATH"
+          PATH: "/usr/local/bin:${{ env.PATH }}"
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
