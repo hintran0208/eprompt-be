@@ -4,6 +4,9 @@
 fastapi
 uvicorn[standard]
 
+# Template Engine
+jinja2
+
 # Database
 sqlalchemy
 psycopg2-binary
