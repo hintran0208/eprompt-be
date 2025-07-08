@@ -82,19 +82,24 @@ jobs:
 
       - name: Install Heroku CLI
         run: |
-          curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
-          export PATH="$PATH:/usr/local/bin"
-          echo "/usr/local/bin" >> $GITHUB_PATH
+          # Install Heroku CLI using snap (more reliable on Ubuntu)
+          sudo snap install --classic heroku
+
+          # Verify installation
+          heroku --version
+
+          # Make sure it's in PATH
+          echo "/snap/bin" >> $GITHUB_PATH
 
       - name: Login to Heroku
         run: |
-          echo ${{ secrets.HEROKU_API_KEY }} | /usr/local/bin/heroku auth:token
+          echo ${{ secrets.HEROKU_API_KEY }} | heroku auth:token
 
       - name: Deploy to Heroku
         run: |
           # Add Heroku remote if it doesn't exist
           if ! git remote | grep -q heroku; then
-            /usr/local/bin/heroku git:remote -a ${{ secrets.HEROKU_APP_NAME }}
+            heroku git:remote -a ${{ secrets.HEROKU_APP_NAME }}
           fi
 
           # Deploy to Heroku
@@ -105,7 +110,7 @@ jobs:
         run: |
           # Run migrations if alembic is set up
           if [ -f "alembic.ini" ]; then
-            /usr/local/bin/heroku run alembic upgrade head --app ${{ secrets.HEROKU_APP_NAME }}
+            heroku run alembic upgrade head --app ${{ secrets.HEROKU_APP_NAME }}
           fi
         continue-on-error: true
 
@@ -122,6 +127,6 @@ jobs:
           else
             echo "❌ Health check failed with HTTP $response"
             echo "📋 Checking logs for troubleshooting..."
-            /usr/local/bin/heroku logs --tail --num=50 --app ${{ secrets.HEROKU_APP_NAME }} || true
+            heroku logs --tail --num=50 --app ${{ secrets.HEROKU_APP_NAME }} || true
             exit 1
           fi
