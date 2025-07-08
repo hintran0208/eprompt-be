@@ -85,18 +85,18 @@ jobs:
           # Install Heroku CLI using the official method
           curl https://cli-assets.heroku.com/install.sh | sh
 
-          # Add to PATH
-          export PATH="$HOME/.local/bin:$PATH"
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          # Add to PATH (it installs to /usr/local/bin)
+          export PATH="/usr/local/bin:$PATH"
+          echo "/usr/local/bin" >> $GITHUB_PATH
 
           # Verify installation
-          $HOME/.local/bin/heroku --version
+          /usr/local/bin/heroku --version
 
       - name: Login to Heroku
         run: |
           echo ${{ secrets.HEROKU_API_KEY }} | heroku auth:token
         env:
-          PATH: "$HOME/.local/bin:$PATH"
+          PATH: "/usr/local/bin:$PATH"
 
       - name: Deploy to Heroku
         run: |
@@ -108,7 +108,7 @@ jobs:
           # Deploy to Heroku
           git push heroku HEAD:main --force
         env:
-          PATH: "$HOME/.local/bin:$PATH"
+          PATH: "/usr/local/bin:$PATH"
 
       - name: Run database migrations (if needed)
         if: success()
@@ -119,7 +119,7 @@ jobs:
           fi
         continue-on-error: true
         env:
-          PATH: "$HOME/.local/bin:$PATH"
+          PATH: "/usr/local/bin:$PATH"
 
       - name: Health check
         if: success()
@@ -138,4 +138,4 @@ jobs:
             exit 1
           fi
         env:
-          PATH: "$HOME/.local/bin:$PATH"
+          PATH: "/usr/local/bin:$PATH"
