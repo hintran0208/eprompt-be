@@ -82,18 +82,21 @@ jobs:
 
       - name: Install Heroku CLI
         run: |
-          # Install Heroku CLI using snap (more reliable on Ubuntu)
-          sudo snap install --classic heroku
+          # Install Heroku CLI using the official method
+          curl https://cli-assets.heroku.com/install.sh | sh
+
+          # Add to PATH
+          export PATH="$HOME/.local/bin:$PATH"
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
           # Verify installation
-          heroku --version
-
-          # Make sure it's in PATH
-          echo "/snap/bin" >> $GITHUB_PATH
+          $HOME/.local/bin/heroku --version
 
       - name: Login to Heroku
         run: |
           echo ${{ secrets.HEROKU_API_KEY }} | heroku auth:token
+        env:
+          PATH: "$HOME/.local/bin:$PATH"
 
       - name: Deploy to Heroku
         run: |
@@ -104,6 +107,8 @@ jobs:
 
           # Deploy to Heroku
           git push heroku HEAD:main --force
+        env:
+          PATH: "$HOME/.local/bin:$PATH"
 
       - name: Run database migrations (if needed)
         if: success()
@@ -113,6 +118,8 @@ jobs:
             heroku run alembic upgrade head --app ${{ secrets.HEROKU_APP_NAME }}
           fi
         continue-on-error: true
+        env:
+          PATH: "$HOME/.local/bin:$PATH"
 
       - name: Health check
         if: success()
@@ -130,3 +137,5 @@ jobs:
             heroku logs --tail --num=50 --app ${{ secrets.HEROKU_APP_NAME }} || true
             exit 1
           fi
+        env:
+          PATH: "$HOME/.local/bin:$PATH"
