@@ -104,6 +104,14 @@ jobs:
 
       - name: Deploy to Heroku
         run: |
+          # Configure git for Heroku authentication
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+
+          # Set up Heroku authentication
+          echo "machine git.heroku.com login _ password ${{ secrets.HEROKU_API_KEY }}" > ~/.netrc
+          chmod 600 ~/.netrc
+
           # Add Heroku remote if it doesn't exist
           if ! git remote | grep -q heroku; then
             heroku git:remote -a ${{ secrets.HEROKU_APP_NAME }}
