@@ -81,6 +81,7 @@ jobs:
           fetch-depth: 0 # Fetch full history for proper git operations
 
       - name: Install Heroku CLI
+        shell: bash
         run: |
           # Install Heroku CLI using the official method
           curl https://cli-assets.heroku.com/install.sh | sh
@@ -93,12 +94,26 @@ jobs:
           /usr/local/bin/heroku --version
 
       - name: Login to Heroku
+        shell: bash
         run: |
-          echo ${{ secrets.HEROKU_API_KEY }} | heroku auth:token
+          # Create .netrc file for authentication
+          cat > ~/.netrc << EOF
+          machine api.heroku.com
+            login ${{ secrets.HEROKU_EMAIL }}
+            password ${{ secrets.HEROKU_API_KEY }}
+          machine git.heroku.com
+            login ${{ secrets.HEROKU_EMAIL }}
+            password ${{ secrets.HEROKU_API_KEY }}
+          EOF
+          chmod 600 ~/.netrc
+
+          # Verify authentication
+          heroku auth:whoami
         env:
           PATH: "/usr/local/bin:$PATH"
 
       - name: Deploy to Heroku
+        shell: bash
         run: |
           # Add Heroku remote if it doesn't exist
           if ! git remote | grep -q heroku; then
@@ -112,6 +127,7 @@ jobs:
 
       - name: Run database migrations (if needed)
         if: success()
+        shell: bash
         run: |
           # Run migrations if alembic is set up
           if [ -f "alembic.ini" ]; then
@@ -123,6 +139,7 @@ jobs:
 
       - name: Health check
         if: success()
+        shell: bash
         run: |
           sleep 30  # Wait for app to start
           response=$(curl -s -o /dev/null -w "%{http_code}" https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com/health)
