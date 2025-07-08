@@ -100,7 +100,6 @@ jobs:
           # Verify authentication works
           heroku auth:whoami
         env:
-          PATH: "/usr/local/bin:${{ env.PATH }}"
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Deploy to Heroku
@@ -113,7 +112,6 @@ jobs:
           # Deploy to Heroku
           git push heroku HEAD:main --force
         env:
-          PATH: "/usr/local/bin:${{ env.PATH }}"
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Run database migrations (if needed)
@@ -125,7 +123,6 @@ jobs:
           fi
         continue-on-error: true
         env:
-          PATH: "/usr/local/bin:${{ env.PATH }}"
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Health check
@@ -145,5 +142,4 @@ jobs:
             exit 1
           fi
         env:
-          PATH: "/usr/local/bin:${{ env.PATH }}"
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
