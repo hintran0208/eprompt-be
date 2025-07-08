@@ -94,7 +94,6 @@ jobs:
           /usr/local/bin/heroku --version
 
       - name: Login to Heroku
-        shell: bash
         run: |
           # Set up Heroku authentication using environment variables
           export HEROKU_API_KEY="${{ secrets.HEROKU_API_KEY }}"
@@ -106,7 +105,6 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Deploy to Heroku
-        shell: bash
         run: |
           # Add Heroku remote if it doesn't exist
           if ! git remote | grep -q heroku; then
@@ -121,7 +119,6 @@ jobs:
 
       - name: Run database migrations (if needed)
         if: success()
-        shell: bash
         run: |
           # Run migrations if alembic is set up
           if [ -f "alembic.ini" ]; then
@@ -134,7 +131,6 @@ jobs:
 
       - name: Health check
         if: success()
-        shell: bash
         run: |
           sleep 30  # Wait for app to start
           response=$(curl -s -o /dev/null -w "%{http_code}" https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com/health)
