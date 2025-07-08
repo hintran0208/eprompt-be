@@ -123,3 +123,38 @@ class Prompt(PromptBase):
 
     class Config:
         orm_mode = True
+
+
+# Refiner schemas
+class RefinerTool(BaseModel):
+    """Schema for refiner tool information."""
+    id: str
+    name: str
+    icon: str
+    description: str
+    color: str
+
+
+class RefinePromptRequest(BaseModel):
+    """Request schema for refining a prompt."""
+    content: str = Field(description="The content/prompt to refine")
+    tool_id: str = Field(description="ID of the refiner tool to use")
+    ai_model_config: ModelConfig
+
+
+class RefinePromptResponse(BaseModel):
+    """Response schema for refined prompt."""
+    refined_content: str = Field(description="The refined/improved content")
+    tool_used: str = Field(description="Name of the tool used")
+    tool_id: str = Field(description="ID of the tool used")
+    original_length: int = Field(description="Length of original content")
+    refined_length: int = Field(description="Length of refined content")
+    tokens_used: Optional[int] = Field(default=0, description="Tokens used in refinement")
+    latency_ms: int = Field(description="Processing time in milliseconds")
+    timestamp: str = Field(description="When the refinement was completed")
+
+
+class RefinerToolsResponse(BaseModel):
+    """Response schema for available refiner tools."""
+    tools: List[RefinerTool]
+    count: int
