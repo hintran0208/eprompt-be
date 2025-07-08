@@ -77,13 +77,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.13.15
         with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          fetch-depth: 0 # Fetch full history for proper git operations
 
       - name: Install Heroku CLI
         run: |
@@ -91,12 +86,23 @@ jobs:
           export PATH="$PATH:/usr/local/bin"
           echo "/usr/local/bin" >> $GITHUB_PATH
 
+      - name: Login to Heroku
+        run: |
+          echo ${{ secrets.HEROKU_API_KEY }} | /usr/local/bin/heroku auth:token
+
+      - name: Deploy to Heroku
+        run: |
+          # Add Heroku remote if it doesn't exist
+          if ! git remote | grep -q heroku; then
+            /usr/local/bin/heroku git:remote -a ${{ secrets.HEROKU_APP_NAME }}
+          fi
+
+          # Deploy to Heroku
+          git push heroku HEAD:main --force
+
       - name: Run database migrations (if needed)
         if: success()
         run: |
-          # Login to Heroku using API key
-          echo ${{ secrets.HEROKU_API_KEY }} | /usr/local/bin/heroku auth:token
-
           # Run migrations if alembic is set up
           if [ -f "alembic.ini" ]; then
             /usr/local/bin/heroku run alembic upgrade head --app ${{ secrets.HEROKU_APP_NAME }}
