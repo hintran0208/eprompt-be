@@ -137,17 +137,7 @@ jobs:
         if: success()
         run: |
           sleep 30  # Wait for app to start
-          response=$(curl -s -o /dev/null -w "%{http_code}" https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com/health)
-          if [ $response -eq 200 ]; then
-            echo "✅ Deployment successful! App is responding with HTTP $response"
-            # Also check the main endpoint
-            main_response=$(curl -s -o /dev/null -w "%{http_code}" https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com/)
-            echo "🏠 Main endpoint responding with HTTP $main_response"
-          else
-            echo "❌ Health check failed with HTTP $response"
-            echo "📋 Checking logs for troubleshooting..."
-            heroku logs --tail --num=50 --app ${{ secrets.HEROKU_APP_NAME }} || true
-            exit 1
-          fi
+          curl -f https://eprompt-be-4e52843fa931.herokuapp.com/health || exit 1
+          echo "✅ Deployment successful! Health check passed"
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
