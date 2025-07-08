@@ -96,21 +96,14 @@ jobs:
       - name: Login to Heroku
         shell: bash
         run: |
-          # Create .netrc file for authentication
-          cat > ~/.netrc << EOF
-          machine api.heroku.com
-            login ${{ secrets.HEROKU_EMAIL }}
-            password ${{ secrets.HEROKU_API_KEY }}
-          machine git.heroku.com
-            login ${{ secrets.HEROKU_EMAIL }}
-            password ${{ secrets.HEROKU_API_KEY }}
-          EOF
-          chmod 600 ~/.netrc
+          # Set up Heroku authentication using environment variables
+          export HEROKU_API_KEY="${{ secrets.HEROKU_API_KEY }}"
 
-          # Verify authentication
+          # Verify authentication works
           heroku auth:whoami
         env:
           PATH: "/usr/local/bin:$PATH"
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Deploy to Heroku
         shell: bash
@@ -124,6 +117,7 @@ jobs:
           git push heroku HEAD:main --force
         env:
           PATH: "/usr/local/bin:$PATH"
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Run database migrations (if needed)
         if: success()
@@ -136,6 +130,7 @@ jobs:
         continue-on-error: true
         env:
           PATH: "/usr/local/bin:$PATH"
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
 
       - name: Health check
         if: success()
@@ -156,3 +151,4 @@ jobs:
           fi
         env:
           PATH: "/usr/local/bin:$PATH"
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
