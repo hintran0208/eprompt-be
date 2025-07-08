@@ -1,9 +1,14 @@
 # app/core/config.py
+import os
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "ePrompt Backend API"
     API_V1_STR: str = "/api/v1"
+    
+    # Server
+    HOST: str = "0.0.0.0"
+    PORT: int = int(os.getenv("PORT", 8001))
 
     # Database
     DATABASE_URL: str

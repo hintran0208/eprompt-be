@@ -19,8 +19,12 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 def read_root():
     return {"message": "Welcome to ePrompt Backend API"}
 
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "ePrompt Backend API"}
+
 if __name__ == "__main__":
     import uvicorn
     # Change working directory to project root for proper module resolution
     os.chdir(project_root)
-    uvicorn.run("app.main:app", host="127.0.0.1", port=8001, reload=True)
+    uvicorn.run("app.main:app", host=settings.HOST, port=settings.PORT, reload=True)
