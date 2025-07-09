@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
 import generateRoute from "./routes/generate";
 import refineRoute from "./routes/refine";
@@ -7,6 +8,19 @@ import { specs, swaggerUi } from "./config/swagger";
 dotenv.config();
 
 const app = express();
+
+// CORS configuration
+const corsOptions = {
+  origin:
+    process.env.NODE_ENV === "production"
+      ? ["https://api.eprompt.com", "https://eprompt.com"] // Add production domains
+      : true, // Allow all origins in development
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Swagger Documentation
