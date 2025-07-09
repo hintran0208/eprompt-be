@@ -1,13 +1,13 @@
 {
   "name": "eprompt-backend",
-  "description": "ePrompt Backend API - FastAPI application for AI prompt management",
-  "keywords": ["fastapi", "python", "ai", "prompts", "api"],
+  "description": "ePrompt Backend API - Express.js application for AI prompt management",
+  "keywords": ["express", "nodejs", "typescript", "ai", "prompts", "api"],
   "website": "https://github.com/hintran0208/eprompt-be",
   "repository": "https://github.com/hintran0208/eprompt-be",
-  "stack": "heroku-22",
+  "stack": "heroku-24",
   "buildpacks": [
     {
-      "url": "heroku/python"
+      "url": "heroku/nodejs"
     }
   ],
   "env": {

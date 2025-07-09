@@ -1,0 +1,28 @@
+{
+  "name": "eprompt-backend",
+  "version": "1.0.0",
+  "description": "ePrompt Backend API - Express.js application for AI prompt management",
+  "main": "prompt-engine/dist/server.js",
+  "engines": {
+    "node": "18.x",
+    "npm": ">=8.0.0"
+  },
+  "scripts": {
+    "build": "cd prompt-engine && npm ci && npm run build",
+    "start": "cd prompt-engine && npm start",
+    "dev": "cd prompt-engine && npm run dev",
+    "test": "cd prompt-engine && npm test",
+    "postinstall": "cd prompt-engine && npm ci"
+  },
+  "keywords": [
+    "express",
+    "nodejs",
+    "typescript",
+    "ai",
+    "prompts",
+    "api"
+  ],
+  "author": "ePrompt Team",
+  "license": "MIT",
+  "private": true
+}

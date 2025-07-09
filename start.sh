@@ -1,16 +1,24 @@
 #!/bin/bash
 
 # ePrompt Backend Startup Script
-# This script activates the virtual environment and starts the FastAPI server
+# This script starts the Node.js Express server
 
 echo "🚀 Starting ePrompt Backend API..."
 
-# Check if virtual environment exists
-if [ ! -d ".venv" ]; then
-    echo "❌ Virtual environment not found. Please run: python -m venv .venv"
-    exit 1
+# Check if node_modules exists in prompt-engine
+if [ ! -d "prompt-engine/node_modules" ]; then
+    echo "❌ Node modules not found. Installing dependencies..."
+    cd prompt-engine && npm install
+    cd ..
 fi
 
-# Activate virtual environment and run the application
-source .venv/bin/activate
-python app/main.py
+# Build the TypeScript project if dist folder doesn't exist
+if [ ! -d "prompt-engine/dist" ]; then
+    echo "🔨 Building TypeScript project..."
+    cd prompt-engine && npm run build
+    cd ..
+fi
+
+# Start the application
+echo "🎯 Starting Express server..."
+cd prompt-engine && npm start

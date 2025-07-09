@@ -76,7 +76,7 @@ echo -e "${GREEN}🔑 Checking environment variables...${NC}"
 # Check if SECRET_KEY is set
 if ! heroku config:get SECRET_KEY --app "$APP_NAME" &> /dev/null || [ -z "$(heroku config:get SECRET_KEY --app "$APP_NAME")" ]; then
     echo "Setting SECRET_KEY..."
-    SECRET_KEY=$(python -c "import secrets; print(secrets.token_urlsafe(32))")
+    SECRET_KEY=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
     heroku config:set SECRET_KEY="$SECRET_KEY" --app "$APP_NAME"
 fi
 
@@ -99,16 +99,20 @@ if ! git remote | grep -q "heroku"; then
     heroku git:remote --app "$APP_NAME"
 fi
 
+# Set Node.js buildpack
+echo "Setting Node.js buildpack..."
+heroku buildpacks:set heroku/nodejs --app "$APP_NAME"
+
 # Deploy
 git push heroku main
 
 echo -e "${GREEN}🔄 Running post-deployment tasks...${NC}"
 
-# Run migrations if alembic.ini exists
-if [ -f "alembic.ini" ]; then
-    echo "Running database migrations..."
-    heroku run alembic upgrade head --app "$APP_NAME"
-fi
+# Run database setup if needed (Node.js apps might not need migrations)
+# if [ -f "prompt-engine/package.json" ]; then
+#     echo "Running any post-deployment setup..."
+#     heroku run npm run postdeploy --app "$APP_NAME" 2>/dev/null || echo "No postdeploy script found"
+# fi
 
 # Health check
 echo -e "${GREEN}🏥 Performing health check...${NC}"
@@ -117,7 +121,7 @@ sleep 10  # Wait for app to start
 APP_URL="https://$APP_NAME.herokuapp.com"
 HEALTH_URL="$APP_URL/health"
 
-if curl -s "$HEALTH_URL" | grep -q "healthy"; then
+if curl -s "$HEALTH_URL" | grep -q '"status":"OK"'; then
     echo -e "${GREEN}✅ Deployment successful!${NC}"
     echo "App URL: $APP_URL"
     echo "Health check: $HEALTH_URL"

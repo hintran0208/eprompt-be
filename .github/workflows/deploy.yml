@@ -53,6 +53,8 @@ jobs:
           if ! git remote | grep -q heroku; then
             heroku git:remote -a ${{ secrets.HEROKU_APP_NAME }}
           fi
+          # Set the buildpack to Node.js
+          heroku buildpacks:set heroku/nodejs -a ${{ secrets.HEROKU_APP_NAME }}
           git push heroku HEAD:main --force
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
