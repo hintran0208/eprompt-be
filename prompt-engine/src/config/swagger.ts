@@ -10,7 +10,7 @@ const options = {
       description: "A powerful API for generating and refining prompts using AI",
       contact: {
         name: "ePrompt Team",
-        email: "support@eprompt.com",
+        email: "support@eprompt.me",
       },
       license: {
         name: "MIT",
@@ -21,7 +21,7 @@ const options = {
       {
         url:
           process.env.NODE_ENV === "production"
-            ? "https://api.eprompt.com"
+            ? "https://api.eprompt.me"
             : `http://localhost:${process.env.PORT || 3000}`,
         description:
           process.env.NODE_ENV === "production" ? "Production server" : "Development server",
