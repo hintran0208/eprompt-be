@@ -5,6 +5,7 @@ A comprehensive Node.js + TypeScript library and API for intelligent prompt gene
 ## 🌟 Features
 
 ### Core Functionality
+
 - **Template-based prompt generation** using Handlebars syntax
 - **Context variable substitution** with validation and type safety
 - **Missing field detection** and comprehensive error reporting
@@ -13,6 +14,7 @@ A comprehensive Node.js + TypeScript library and API for intelligent prompt gene
 - **Production-ready Express API** with comprehensive error handling
 
 ### Refinement Tools
+
 - **Concise**: Remove unnecessary words while preserving meaning
 - **Specific**: Add clarity and specificity to reduce ambiguity
 - **Structured**: Improve organization with better sections and flow
@@ -21,6 +23,7 @@ A comprehensive Node.js + TypeScript library and API for intelligent prompt gene
 - **Roleplay**: Transform prompts with role-playing instructions
 
 ### Developer Experience
+
 - **Full TypeScript support** with comprehensive type definitions
 - **Comprehensive test suite** (unit, integration, E2E)
 - **Development server** with hot reload
@@ -30,19 +33,21 @@ A comprehensive Node.js + TypeScript library and API for intelligent prompt gene
 ## 🚀 Quick Start
 
 ### Installation
+
 ```bash
 npm install @eprompt/prompt-engine
 ```
 
 ### Basic Usage as a Library
+
 ```typescript
-import { generatePrompt, createTemplate, refinePrompt } from '@eprompt/prompt-engine';
+import { generatePrompt, createTemplate, refinePrompt } from "@eprompt/prompt-engine";
 
 // Create a template
 const template = createTemplate({
-  id: 'code-review',
-  name: 'Code Review Template',
-  description: 'Generate code review prompts',
+  id: "code-review",
+  name: "Code Review Template",
+  description: "Generate code review prompts",
   template: `As a {{role}}, review the following {{language}} code:
 
 \`\`\`{{language}}
@@ -54,15 +59,15 @@ Please provide feedback on:
 - Performance
 - Best practices
 - Potential improvements`,
-  role: 'Code Reviewer',
-  useCase: 'Code Review'
+  role: "Code Reviewer",
+  useCase: "Code Review",
 });
 
 // Generate a prompt
 const context = {
-  role: 'Senior Software Engineer',
-  language: 'JavaScript',
-  code: 'function sum(arr) { return arr.reduce((a, b) => a + b, 0); }'
+  role: "Senior Software Engineer",
+  language: "JavaScript",
+  code: "function sum(arr) { return arr.reduce((a, b) => a + b, 0); }",
 };
 
 const result = generatePrompt(template, context);
@@ -71,17 +76,18 @@ console.log(result.prompt);
 
 // Check for missing fields
 if (result.missingFields.length > 0) {
-  console.log('Missing required fields:', result.missingFields);
+  console.log("Missing required fields:", result.missingFields);
 }
 
 // Refine a prompt using AI
-const refinementResult = await refinePrompt('Write something about AI', 'specific');
+const refinementResult = await refinePrompt("Write something about AI", "specific");
 console.log(refinementResult.refinedPrompt); // AI-enhanced, much more detailed prompt
 console.log(refinementResult.tokensUsed); // Tokens consumed by the AI
 console.log(refinementResult.latencyMs); // Response time in milliseconds
 ```
 
 ### Running as an API Server
+
 ```bash
 # Development mode
 npm run dev
@@ -91,14 +97,65 @@ npm run build
 npm start
 ```
 
+The API server provides the following endpoints:
+
+- `GET /` - Welcome page with API information
+- `GET /health` - Health check endpoint
+- `GET /api-docs` - Interactive Swagger documentation
+- `POST /generate` - Generate prompts from templates
+- `POST /refine` - Refine prompts using AI
+- `GET /refine/types` - Get available refinement types
+
+Visit `http://localhost:3000/api-docs` to explore the interactive API documentation.
+
 ## 📚 API Documentation
 
 ### REST Endpoints
 
+#### GET /
+
+Welcome endpoint that provides API information and available endpoints.
+
+**Response:**
+
+```json
+{
+  "message": "Welcome to ePrompt API - Prompt Generation & Refinement Engine",
+  "version": "1.0.0",
+  "description": "A powerful API for generating and refining prompts using AI",
+  "endpoints": {
+    "health": "/health",
+    "generate": "/generate",
+    "refine": "/refine",
+    "docs": "/api-docs"
+  },
+  "timestamp": "2025-07-10T12:00:00.000Z"
+}
+```
+
+#### GET /health
+
+Health check endpoint to verify API status.
+
+**Response:**
+
+```json
+{
+  "status": "OK",
+  "timestamp": "2025-07-10T12:00:00.000Z"
+}
+```
+
+#### GET /api-docs
+
+Interactive Swagger UI documentation for the API. Visit this endpoint in your browser to explore and test all available endpoints.
+
 #### POST /generate
+
 Generate a prompt from a template and context.
 
 **Request:**
+
 ```json
 {
   "template": {
@@ -121,6 +178,7 @@ Generate a prompt from a template and context.
 ```
 
 **Response:**
+
 ```json
 {
   "prompt": "Hello Alice! Welcome to ePrompt. As a developer, you have access to advanced AI tools.",
@@ -136,9 +194,11 @@ Generate a prompt from a template and context.
 ```
 
 #### POST /refine
+
 Refine and optimize a prompt using AI-powered refinement tools.
 
 **Request:**
+
 ```json
 {
   "prompt": "Write something about AI",
@@ -153,6 +213,7 @@ Refine and optimize a prompt using AI-powered refinement tools.
 ```
 
 **Response:**
+
 ```json
 {
   "refinedPrompt": "Create a comprehensive guide about artificial intelligence that covers the following aspects: 1) Definition and core concepts of AI, 2) Historical development and key milestones, 3) Current applications across various industries, 4) Future potential and implications for society, 5) Ethical considerations and challenges. Please provide specific examples for each section and ensure the content is accessible to a general audience while maintaining technical accuracy.",
@@ -170,9 +231,11 @@ Refine and optimize a prompt using AI-powered refinement tools.
 ```
 
 #### GET /refine/types
+
 Get all available refinement types and tools.
 
 **Response:**
+
 ```json
 {
   "types": ["concise", "specific", "structured", "context", "constraints", "roleplay"],
@@ -186,7 +249,7 @@ Get all available refinement types and tools.
     },
     {
       "id": "specific",
-      "name": "More Specific", 
+      "name": "More Specific",
       "icon": "🎯",
       "description": "Add clarity and specificity to reduce ambiguity",
       "color": "green"
@@ -194,7 +257,7 @@ Get all available refinement types and tools.
     {
       "id": "structured",
       "name": "Better Structure",
-      "icon": "🏗️", 
+      "icon": "🏗️",
       "description": "Improve organization and readability",
       "color": "indigo"
     },
@@ -202,7 +265,7 @@ Get all available refinement types and tools.
       "id": "context",
       "name": "Add Context",
       "icon": "📋",
-      "description": "Add more comprehensive context and examples", 
+      "description": "Add more comprehensive context and examples",
       "color": "orange"
     },
     {
@@ -225,6 +288,7 @@ Get all available refinement types and tools.
 ```
 
 ### Error Responses
+
 All endpoints return consistent error formats:
 
 ```json
@@ -235,6 +299,7 @@ All endpoints return consistent error formats:
 ```
 
 **Status Codes:**
+
 - `200`: Success
 - `400`: Bad Request (invalid input)
 - `500`: Internal Server Error
@@ -242,58 +307,68 @@ All endpoints return consistent error formats:
 ## 🔧 Advanced Usage
 
 ### AI-Powered Prompt Generation
+
 ```typescript
-import { generateAndRunPrompt, createTemplate, DEFAULT_OPENAI_CONFIG } from '@eprompt/prompt-engine';
+import {
+  generateAndRunPrompt,
+  createTemplate,
+  DEFAULT_OPENAI_CONFIG,
+} from "@eprompt/prompt-engine";
 
 const template = createTemplate({
-  id: 'blog-post',
-  name: 'Blog Post Generator',
-  description: 'Generate blog post outlines',
-  template: 'Create a comprehensive blog post outline about {{topic}} for {{audience}}. Include {{sections}} main sections.',
-  role: 'Content Creator',
-  useCase: 'Content Generation'
+  id: "blog-post",
+  name: "Blog Post Generator",
+  description: "Generate blog post outlines",
+  template:
+    "Create a comprehensive blog post outline about {{topic}} for {{audience}}. Include {{sections}} main sections.",
+  role: "Content Creator",
+  useCase: "Content Generation",
 });
 
 const context = {
-  topic: 'machine learning',
-  audience: 'beginners',
-  sections: '5'
+  topic: "machine learning",
+  audience: "beginners",
+  sections: "5",
 };
 
 const modelConfig = {
-  provider: 'openai' as const,
-  model: 'GPT-4o',
+  provider: "openai" as const,
+  model: "GPT-4o",
   temperature: 0.7,
-  maxTokens: 1000
+  maxTokens: 1000,
 };
 
 const result = await generateAndRunPrompt(template, context, modelConfig);
-console.log('Generated content:', result.result);
-console.log('Tokens used:', result.tokensUsed);
-console.log('Latency:', result.latencyMs, 'ms');
+console.log("Generated content:", result.result);
+console.log("Tokens used:", result.tokensUsed);
+console.log("Latency:", result.latencyMs, "ms");
 ```
 
 ### Using Refinement Tools
+
 ```typescript
-import { refinerTools } from '@eprompt/prompt-engine';
+import { refinerTools } from "@eprompt/prompt-engine";
 
 // Get all available refinement tools
-console.log('Available tools:', refinerTools.map(t => t.name));
+console.log(
+  "Available tools:",
+  refinerTools.map((t) => t.name)
+);
 
 // Use a specific refinement tool
-const specificTool = refinerTools.find(t => t.id === 'specific');
-const originalPrompt = 'Write something about AI';
+const specificTool = refinerTools.find((t) => t.id === "specific");
+const originalPrompt = "Write something about AI";
 const metaPrompt = `${specificTool.prompt}\n\nOriginal Prompt: "${originalPrompt}"`;
 
 // Use with AI to get refined prompt
 const refinedResult = await generateAndRunPrompt(
   createTemplate({
-    id: 'refinement',
-    name: 'Prompt Refinement',
-    description: 'Refine prompts',
+    id: "refinement",
+    name: "Prompt Refinement",
+    description: "Refine prompts",
     template: metaPrompt,
-    role: 'Prompt Engineer',
-    useCase: 'Refinement'
+    role: "Prompt Engineer",
+    useCase: "Refinement",
   }),
   {},
   modelConfig
@@ -301,22 +376,23 @@ const refinedResult = await generateAndRunPrompt(
 ```
 
 ### Custom Template Creation
+
 ```typescript
-import { createTemplate, extractTemplateVariables } from '@eprompt/prompt-engine';
+import { createTemplate, extractTemplateVariables } from "@eprompt/prompt-engine";
 
 // Extract variables from template string
-const templateString = 'Hello {{name}}, your {{item}} is ready for {{action}}.';
+const templateString = "Hello {{name}}, your {{item}} is ready for {{action}}.";
 const variables = extractTemplateVariables(templateString);
 console.log(variables); // ['name', 'item', 'action']
 
 // Create template with automatic variable detection
 const template = createTemplate({
-  id: 'notification',
-  name: 'Notification Template',
-  description: 'Generic notification template',
+  id: "notification",
+  name: "Notification Template",
+  description: "Generic notification template",
   template: templateString,
-  role: 'System',
-  useCase: 'Notifications'
+  role: "System",
+  useCase: "Notifications",
   // requiredFields automatically set to extracted variables
 });
 ```
@@ -324,13 +400,14 @@ const template = createTemplate({
 ## 🧪 Testing
 
 ### Running Tests
+
 ```bash
 # Run all tests
 npm test
 
 # Run specific test suites
 npm test -- --testNamePattern="unit"
-npm test -- --testNamePattern="integration" 
+npm test -- --testNamePattern="integration"
 npm test -- --testNamePattern="e2e"
 
 # Run tests in watch mode
@@ -341,6 +418,7 @@ npm run test:coverage
 ```
 
 ### Test Structure
+
 ```
 src/engine/__tests__/
 ├── generator.unit.test.ts      # Core generation logic
@@ -352,10 +430,12 @@ src/engine/__tests__/
 ├── e2e.userFlow.test.ts        # Complete user workflows
 └── e2e.refiner.test.ts         # E2E refinement tests with real AI calls
 ```
+
 ```
 
 ### Example Test Output
 ```
+
 --- OPENAI CONFIG ---
 API Host: https://aiportalapi.stu-platform.live/jpe/v1
 API Key: Bearer sk-dwFEogyru-tSQqgObMgpKw
@@ -369,7 +449,8 @@ Prompt: Say hello to the world.
 --- AI RESPONSE ---
 Content: Hello, World! 🌍✨
 Tokens Used: 21
-```
+
+````
 
 ## 🔐 Configuration
 
@@ -385,18 +466,19 @@ OPENAI_MAX_TOKENS=2000
 # Server Configuration
 PORT=3000
 NODE_ENV=development
-```
+````
 
 ### Custom OpenAI Configuration
+
 ```typescript
-import { createOpenAIClient, OpenAIConfig } from '@eprompt/prompt-engine';
+import { createOpenAIClient, OpenAIConfig } from "@eprompt/prompt-engine";
 
 const customConfig: OpenAIConfig = {
-  apiHost: 'https://your-custom-api.com/v1',
-  apiKey: 'Bearer your-api-key',
-  model: 'gpt-4',
+  apiHost: "https://your-custom-api.com/v1",
+  apiKey: "Bearer your-api-key",
+  model: "gpt-4",
   temperature: 0.5,
-  maxTokens: 1500
+  maxTokens: 1500,
 };
 
 const client = createOpenAIClient(customConfig);
@@ -405,6 +487,7 @@ const client = createOpenAIClient(customConfig);
 ## 📦 TypeScript Types
 
 ### Core Types
+
 ```typescript
 // Template definition
 type PromptTemplate = {
@@ -436,7 +519,7 @@ type PromptOutput = {
 
 // AI model configuration
 type ModelConfig = {
-  provider: 'openai' | 'anthropic' | 'google' | 'local';
+  provider: "openai" | "anthropic" | "google" | "local";
   model: string;
   temperature?: number;
   maxTokens?: number;
@@ -481,6 +564,7 @@ type RefinementResult = {
 ## 🛠️ Development
 
 ### Available Scripts
+
 ```bash
 npm run dev      # Start development server with hot reload
 npm run build    # Build TypeScript to JavaScript
@@ -490,6 +574,7 @@ npm run clean    # Clean build artifacts
 ```
 
 ### Project Structure
+
 ```
 src/
 ├── engine/              # Core engine logic
@@ -506,6 +591,7 @@ src/
 ```
 
 ### Building and Publishing
+
 ```bash
 # Build for production
 npm run build
@@ -520,6 +606,7 @@ npm pack
 ## 🚀 Deployment
 
 ### Heroku
+
 ```bash
 # Create Heroku app
 heroku create your-app-name
@@ -532,6 +619,7 @@ git push heroku main
 ```
 
 ### Docker
+
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app
@@ -545,6 +633,7 @@ CMD ["npm", "start"]
 ```
 
 ### PM2 (Production)
+
 ```json
 {
   "name": "prompt-engine",
@@ -571,6 +660,7 @@ CMD ["npm", "start"]
 9. Open a Pull Request
 
 ### Development Guidelines
+
 - Follow TypeScript best practices
 - Add tests for all new functionality
 - Update documentation for API changes
@@ -591,6 +681,7 @@ MIT License - see LICENSE file for details.
 ## 📞 Support
 
 For questions, issues, or contributions:
+
 - 📧 Contact the ePrompt team
 - 🐛 [Open an issue](https://github.com/your-org/eprompt-be/issues)
 - 📖 Check the comprehensive test suite for usage examples
