@@ -38,9 +38,6 @@
 			"description": "JWT token expiration time in minutes",
 			"value": "30"
 		},
-		"DATABASE_URL": {
-			"description": "PostgreSQL database URL"
-		},
 		"OPENAI_API_KEY": {
 			"description": "OpenAI API key for AI services"
 		},
@@ -53,6 +50,11 @@
 		"COHERE_API_KEY": {
 			"description": "Cohere API key"
 		},
+		"MONGO_URI": {
+			"description": "MongoDB connection string",
+			"value": "",
+			"required": true
+		},
 		"SUPABASE_URL": {
 			"description": "Supabase project URL"
 		},
@@ -61,9 +63,6 @@
 		}
 	},
 	"addons": [
-		{
-			"plan": "heroku-postgresql:essential-0"
-		},
 		{
 			"plan": "heroku-redis:mini"
 		}

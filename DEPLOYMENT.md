@@ -35,9 +35,6 @@ In your GitHub repository, go to **Settings** → **Secrets and variables** → 
 Set the required environment variables in your Heroku app:
 
 ```bash
-# Database (automatically set with PostgreSQL addon)
-heroku addons:create heroku-postgresql:essential-0 --app your-app-name
-
 # Redis (for Celery background tasks)
 heroku addons:create heroku-redis:mini --app your-app-name
 
@@ -59,14 +56,14 @@ heroku config:set SUPABASE_KEY="your-supabase-key" --app your-app-name
 # Run migrations after deployment
 heroku run alembic upgrade head --app your-app-name
 ``` 
-TODO Replace with an other Nodejs migration library
+TODO Replace with an other Nodejs migration library if needed
 -->
 
 ## Deployment Process
 
 The GitHub Actions workflow will automatically:
 
-1. **Test**: Run tests with PostgreSQL in a containerized environment
+1. **Test**: Run tests with MongoDB in a containerized environment
 2. **Deploy**: Deploy to Heroku when code is pushed to the `main` branch
 3. **Health Check**: Verify the application is running correctly
 
@@ -104,16 +101,16 @@ heroku open --app your-app-name
 
 The app uses different configurations for different environments:
 
-- **Development**: Local settings with SQLite/PostgreSQL
-- **Testing**: GitHub Actions with PostgreSQL service
-- **Production**: Heroku with PostgreSQL addon
+- **Development**: Local settings with MongoDB
+- **Testing**: GitHub Actions with MongoDB
+- **Production**: Heroku with MongoDB
 
 ## Troubleshooting
 
 ### Common Issues
 
 1. **Build Failures**: Check that all dependencies in `requirements.txt` are valid
-2. **Database Errors**: Ensure DATABASE_URL is set and PostgreSQL addon is attached
+2. **Database Errors**: Ensure MONGO_URI is set
 3. **Environment Variables**: Verify all required secrets are set in both GitHub and Heroku
 
 ### Useful Commands

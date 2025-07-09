@@ -10,7 +10,8 @@
       "require": "./dist/engine/index.js",
       "types": "./dist/engine/index.d.ts"
     }
-  },  "scripts": {
+  },
+  "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
@@ -38,7 +39,8 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "handlebars": "^4.7.8"
+    "handlebars": "^4.7.8",
+    "mongoose": "^8.16.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",

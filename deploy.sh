@@ -59,12 +59,6 @@ fi
 
 echo -e "${GREEN}🔧 Setting up Heroku add-ons...${NC}"
 
-# Add PostgreSQL if not exists
-if ! heroku addons --app "$APP_NAME" | grep -q "heroku-postgresql"; then
-    echo "Adding PostgreSQL..."
-    heroku addons:create heroku-postgresql:essential-0 --app "$APP_NAME"
-fi
-
 # Add Redis if not exists
 if ! heroku addons --app "$APP_NAME" | grep -q "heroku-redis"; then
     echo "Adding Redis..."
@@ -109,7 +103,7 @@ echo -e "${GREEN}🔄 Running post-deployment tasks...${NC}"
 #     echo "Running database migrations..."
 #     heroku run alembic upgrade head --app "$APP_NAME"
 # fi 
-# TODO Replace with an other Nodejs migration library
+# TODO Replace with an other Nodejs migration library if needed
 
 # Health check
 echo -e "${GREEN}🏥 Performing health check...${NC}"
