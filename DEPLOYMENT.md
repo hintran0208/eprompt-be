@@ -53,12 +53,14 @@ heroku config:set SUPABASE_KEY="your-supabase-key" --app your-app-name
 
 ### 4. Database Setup
 
-If you're using Alembic for database migrations:
+<!-- If you're using Alembic for database migrations:
 
 ```bash
 # Run migrations after deployment
 heroku run alembic upgrade head --app your-app-name
-```
+``` 
+TODO Replace with an other Nodejs migration library
+-->
 
 ## Deployment Process
 

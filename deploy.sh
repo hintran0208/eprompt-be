@@ -105,10 +105,11 @@ git push heroku main
 echo -e "${GREEN}🔄 Running post-deployment tasks...${NC}"
 
 # Run migrations if alembic.ini exists
-if [ -f "alembic.ini" ]; then
-    echo "Running database migrations..."
-    heroku run alembic upgrade head --app "$APP_NAME"
-fi
+# if [ -f "alembic.ini" ]; then
+#     echo "Running database migrations..."
+#     heroku run alembic upgrade head --app "$APP_NAME"
+# fi 
+# TODO Replace with an other Nodejs migration library
 
 # Health check
 echo -e "${GREEN}🏥 Performing health check...${NC}"

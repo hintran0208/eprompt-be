@@ -1,64 +1,71 @@
 {
-  "name": "eprompt-backend",
-  "description": "ePrompt Backend API - FastAPI application for AI prompt management",
-  "keywords": ["fastapi", "python", "ai", "prompts", "api"],
-  "website": "https://github.com/hintran0208/eprompt-be",
-  "repository": "https://github.com/hintran0208/eprompt-be",
-  "stack": "heroku-22",
-  "buildpacks": [
-    {
-      "url": "heroku/python"
-    }
-  ],
-  "env": {
-    "PROJECT_NAME": {
-      "description": "Name of the project",
-      "value": "ePrompt Backend API"
-    },
-    "API_V1_STR": {
-      "description": "API version prefix",
-      "value": "/api/v1"
-    },
-    "SECRET_KEY": {
-      "description": "Secret key for JWT token generation",
-      "generator": "secret"
-    },
-    "ALGORITHM": {
-      "description": "Algorithm for JWT token generation",
-      "value": "HS256"
-    },
-    "ACCESS_TOKEN_EXPIRE_MINUTES": {
-      "description": "JWT token expiration time in minutes",
-      "value": "30"
-    },
-    "DATABASE_URL": {
-      "description": "PostgreSQL database URL"
-    },
-    "OPENAI_API_KEY": {
-      "description": "OpenAI API key for AI services"
-    },
-    "ANTHROPIC_API_KEY": {
-      "description": "Anthropic API key for Claude AI"
-    },
-    "GEMINI_API_KEY": {
-      "description": "Google Gemini API key"
-    },
-    "COHERE_API_KEY": {
-      "description": "Cohere API key"
-    },
-    "SUPABASE_URL": {
-      "description": "Supabase project URL"
-    },
-    "SUPABASE_KEY": {
-      "description": "Supabase API key"
-    }
-  },
-  "addons": [
-    {
-      "plan": "heroku-postgresql:essential-0"
-    },
-    {
-      "plan": "heroku-redis:mini"
-    }
-  ]
+	"name": "eprompt-backend",
+	"description": "ePrompt Backend API - Prompt generation and refinement backend for ePrompt.",
+	"keywords": [
+		"prompt",
+		"engine",
+		"generation",
+		"refinement",
+		"express",
+		"typescript"
+	],
+	"website": "https://github.com/hintran0208/eprompt-be",
+	"repository": "https://github.com/hintran0208/eprompt-be",
+	"stack": "heroku-22",
+	"buildpacks": [
+		{
+			"url": "heroku/nodejs"
+		}
+	],
+	"env": {
+		"PROJECT_NAME": {
+			"description": "Name of the project",
+			"value": "ePrompt Backend API"
+		},
+		"API_V1_STR": {
+			"description": "API version prefix",
+			"value": "/api/v1"
+		},
+		"SECRET_KEY": {
+			"description": "Secret key for JWT token generation",
+			"generator": "secret"
+		},
+		"ALGORITHM": {
+			"description": "Algorithm for JWT token generation",
+			"value": "HS256"
+		},
+		"ACCESS_TOKEN_EXPIRE_MINUTES": {
+			"description": "JWT token expiration time in minutes",
+			"value": "30"
+		},
+		"DATABASE_URL": {
+			"description": "PostgreSQL database URL"
+		},
+		"OPENAI_API_KEY": {
+			"description": "OpenAI API key for AI services"
+		},
+		"ANTHROPIC_API_KEY": {
+			"description": "Anthropic API key for Claude AI"
+		},
+		"GEMINI_API_KEY": {
+			"description": "Google Gemini API key"
+		},
+		"COHERE_API_KEY": {
+			"description": "Cohere API key"
+		},
+		"SUPABASE_URL": {
+			"description": "Supabase project URL"
+		},
+		"SUPABASE_KEY": {
+			"description": "Supabase API key"
+		}
+	},
+	"addons": [
+		{
+			"plan": "heroku-postgresql:essential-0"
+		},
+		{
+			"plan": "heroku-redis:mini"
+		}
+	]
 }

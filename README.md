@@ -24,7 +24,6 @@ eprompt-be/
 ├── app.json               # Heroku app configuration
 ├── Procfile               # Heroku process configuration
 ├── deploy.sh              # Deployment script
-├── start.sh               # Local startup script
 ├── DEPLOYMENT.md          # Deployment instructions
 └── README.md              # This file
 ```
