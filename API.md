@@ -323,10 +323,7 @@ Search from database using semantic search.
   "results": [
     {
       "text": "This is the result",
-      "score": 0.69,
-      "metadata": {
-        "generatedAt": "2025-07-10T12:00:00.000Z"
-      }
+      "score": 0.69
     },
   ],
 }
@@ -338,7 +335,6 @@ Search from database using semantic search.
 | ---------------------- | ------ | ------------------------------------------ |
 | `text`                 | string | Semantic search result                     |
 | `score`                | number | Semantic similarity score                  |
-| `metadata`             | object | Additional metadata about the result       |
 
 #### Error Examples
 

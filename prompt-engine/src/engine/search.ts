@@ -13,17 +13,11 @@ export async function generateSearch(
             {
                 text: "result",
                 score: 0.8,
-                metadata: {
-                    createdAt: "2026",
-                }
             },
             {
                 text: "result2",
                 score: 0.78,
-                metadata: {
-                    createdAt: "0000",
-                }
             },
-        ]
+        ],
     };
 }

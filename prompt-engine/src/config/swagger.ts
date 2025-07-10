@@ -114,17 +114,10 @@ const options = {
               type: "number",
               description: "semantic similarity score",
             },
-            metadata: {
-              type: "object",
-              description: "Additional metadata about the generation",
-            },
           },
           example: {
             text: "This is the result",
             score: 0.69,
-            metadata: {
-              generatedAt: "2025-07-10T12:00:00.000Z",
-            },
           },
         },
         Error: {

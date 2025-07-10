@@ -312,10 +312,7 @@ Semantic search from a database using a natural language query.
   "results": [
     {
       "text": "This is the result",
-      "score": 0.69,
-      "metadata": {
-        "generatedAt": "2025-07-10T12:00:00.000Z"
-      }
+      "score": 0.69
     },
   ],
 }
