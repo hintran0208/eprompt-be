@@ -227,7 +227,7 @@ curl -X POST http://localhost:3000/refine \
   }'
 ```
 
-### Prompy Search
+### Prompt Search
 ```bash
 curl -X POST http://localhost:3000/search \
   -H "Content-Type: application/json" \
