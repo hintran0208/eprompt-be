@@ -105,7 +105,7 @@ The API server provides the following endpoints:
 - `POST /generate` - Generate prompts from templates
 - `POST /refine` - Refine prompts using AI
 - `GET /refine/types` - Get available refinement types
-- `POST /search` - Search for matching prompts
+- `POST /search` - Find matching prompts using semantic search
 
 Visit `http://localhost:3000/api-docs` to explore the interactive API documentation.
 
