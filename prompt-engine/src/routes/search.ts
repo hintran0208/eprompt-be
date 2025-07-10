@@ -36,9 +36,12 @@ const router = Router();
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                  $ref: '#/components/schemas/SemanticSearchResult'
+ *               type: object
+ *               properties:
+ *                 results:
+ *                   type: array
+ *                   items:
+ *                      $ref: '#/components/schemas/SemanticSearchResult'
  *       400:
  *         description: Bad request - missing or invalid template/context
  *         content:
