@@ -55,7 +55,7 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post("/", (req: Request, res: Response) => {
+router.post("/", async (req: Request, res: Response) => {
   const { query, options } = req.body;
   if (!query || typeof query !== "object" ) {
     return res.status(400).json({ error: "Missing or invalid query" });
@@ -75,7 +75,7 @@ router.post("/", (req: Request, res: Response) => {
       updatedAt: new Date(),
     };
 
-    const output = generateSearch(promptTemplate, options as PromptContext);
+    const output = await generateSearch(promptTemplate, options as PromptContext);
     res.json(output);
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : "Internal error" });

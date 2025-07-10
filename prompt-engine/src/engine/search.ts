@@ -1,6 +1,12 @@
-import { BaseTemplate, PromptContext, SearchOutput } from "./types";
+import { BaseTemplate, PromptContext } from "./types";
 
-export function generateSearch(query: BaseTemplate, options: PromptContext): SearchOutput {
+export async function generateSearch(
+    query: BaseTemplate,
+    options: PromptContext
+): Promise<{
+    results: object[];
+    metadata?: Record<string, any>;
+}> {
     // placeholder
     return {
         results: [

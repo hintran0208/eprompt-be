@@ -33,11 +33,6 @@ export type PromptOutput = {
   metadata?: Record<string, any>;
 };
 
-export type SearchOutput = {
-  results: object[];
-  metadata?: Record<string, any>;
-}
-
 export type ModelConfig = {
   provider: 'openai' | 'anthropic' | 'google' | 'local';
   model: string;

@@ -10,8 +10,8 @@ describe('search module', () => {
 
   const options = { topK: 1 }
 
-  it('search prompt with query', () => {
-    const result = generateSearch(query, options);
+  it('search prompt with query', async () => {
+    const result = await generateSearch(query, options);
     expect(Array.isArray(result.results)).toBe(true);
   });
 });
