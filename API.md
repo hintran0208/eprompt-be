@@ -292,6 +292,54 @@ curl -X POST http://localhost:3000/refine \
 }
 ```
 
+### POST /search
+
+Search from database using semantic search.
+
+#### Request Body
+
+```json
+{
+  "query": {
+    "text": "Prompt for text summarization"
+  },
+  "options": {
+    "topK": 5
+  }
+}
+````
+
+#### Request Properties
+
+| Property       | Type   | Required | Description                                                |
+| -------------- | ------ | -------- | ---------------------------------------------------------- |
+| `query`        | object | Yes      | Query object containing the natural language search string |                          |
+| `options`      | object | Yes      | Configuration for the search options                       |
+
+#### Response
+
+```json
+{
+  "results": [
+    {
+      "text": "This is the result",
+      "score": 0.69,
+      "metadata": {
+        "generatedAt": "2025-07-10T12:00:00.000Z"
+      }
+    },
+  ],
+}
+```
+
+#### Response Properties
+
+| Property               | Type   | Description                                |
+| ---------------------- | ------ | ------------------------------------------ |
+| `text`                 | string | Semantic search result                     |
+| `score`                | number | Semantic similarity score                  |
+| `metadata`             | object | Additional metadata about the result       |
+
 #### Error Examples
 
 **Missing Prompt:**

@@ -11,12 +11,14 @@ eprompt-be/
 │   │   ├── engine/         # Core prompt generation logic
 │   │   │   ├── generator.ts    # Prompt generation and AI integration
 │   │   │   ├── refiner.ts      # Prompt refinement tools
+│   │   │   ├── search.ts       # Prompt semantic search tools
 │   │   │   ├── openai.ts       # OpenAI API client
 │   │   │   ├── types.ts        # TypeScript type definitions
 │   │   │   └── __tests__/      # Comprehensive test suite
 │   │   ├── routes/         # Express API routes
 │   │   │   ├── generate.ts     # POST /generate endpoint
 │   │   │   └── refine.ts       # POST /refine endpoint
+│   │   │   └── search.ts       # POST /search endpoint
 │   │   └── server.ts       # Express server setup
 │   ├── package.json        # Dependencies and scripts
 │   ├── tsconfig.json       # TypeScript configuration
@@ -225,6 +227,21 @@ curl -X POST http://localhost:3000/refine \
   }'
 ```
 
+### Prompy Search
+```bash
+curl -X POST http://localhost:3000/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": {
+      "text": "Prompt for text summarization"
+    },
+    "options": {
+      "topK": 5
+    }
+  }'
+
+```
+
 ### Get Available Refinement Types
 ```bash
 curl -X GET http://localhost:3000/refine/types
@@ -269,6 +286,7 @@ src/engine/__tests__/
 ├── generator.unit.test.ts      # Prompt generation logic
 ├── refiner.unit.test.ts        # AI-powered refinement (unit tests)
 ├── refinerTools.unit.test.ts   # Refinement tool definitions
+├── search.unit.test.ts         # Semantic search tests
 ├── openai.unit.test.ts         # OpenAI API client
 ├── openai.integration.test.ts  # OpenAI integration tests
 ├── integration.api.test.ts     # API endpoint tests

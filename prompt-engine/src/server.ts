@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import generateRoute from "./routes/generate";
 import refineRoute from "./routes/refine";
+import searchRoute from "./routes/search";
 import { specs, swaggerUi } from "./config/swagger";
 
 dotenv.config();
@@ -87,6 +88,7 @@ app.get("/health", (req, res) => {
 
 app.use("/generate", generateRoute);
 app.use("/refine", refineRoute);
+app.use("/search", searchRoute);
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 app.listen(PORT, () => {

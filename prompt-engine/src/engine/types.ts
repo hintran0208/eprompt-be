@@ -1,5 +1,13 @@
 // Core types for PromptVerse
 
+export type BaseTemplate = {
+  text: string;
+  description: string;
+  metadata?: Record<string, any>;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export type PromptTemplate = {
   id: string;
   name: string;
@@ -24,6 +32,11 @@ export type PromptOutput = {
   contextUsed: string[];
   metadata?: Record<string, any>;
 };
+
+export type SearchOutput = {
+  results: object[];
+  metadata?: Record<string, any>;
+}
 
 export type ModelConfig = {
   provider: 'openai' | 'anthropic' | 'google' | 'local';
