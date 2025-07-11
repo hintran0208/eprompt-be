@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeAll, afterAll, jest } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
 import dotenv from 'dotenv';
@@ -7,23 +8,26 @@ import { createTemplate } from '../generator';
 import { DEFAULT_OPENAI_CONFIG } from '../openai';
 
 // Mock the refinePrompt function to avoid actual API calls in integration tests
-jest.mock('../refiner', () => ({
-  ...jest.requireActual('../refiner'),
-  refinePrompt: jest.fn().mockResolvedValue({
-    refinedPrompt: 'This is a refined and improved prompt with better clarity and structure.',
-    originalPrompt: 'Write something about AI',
-    refinementTool: {
-      id: 'specific',
-      name: 'More Specific',
-      icon: '🎯',
-      prompt: 'Enhance the following prompt with more specific instructions and clearer expectations:',
-      description: 'Add clarity and specificity to reduce ambiguity',
-      color: 'green'
-    },
-    tokensUsed: 75,
-    latencyMs: 1200
-  })
-}));
+jest.mock('../refiner');
+
+const mockRefinedResult = {
+  refinedPrompt: 'This is a refined and improved prompt with better clarity and structure.',
+  originalPrompt: 'Write something about AI',
+  refinementTool: {
+    id: 'specific',
+    name: 'More Specific',
+    icon: '🎯',
+    prompt: 'Enhance the following prompt with more specific instructions and clearer expectations:',
+    description: 'Add clarity and specificity to reduce ambiguity',
+    color: 'green'
+  },
+  tokensUsed: 75,
+  latencyMs: 1200
+};
+
+// Import and set up the mock after the module is mocked
+const { refinePrompt } = require('../refiner');
+(refinePrompt as any).mockResolvedValue(mockRefinedResult);
 
 dotenv.config({ path: '../../.env.example' });
 
