@@ -15,12 +15,25 @@ A comprehensive Node.js + TypeScript library and API for intelligent prompt gene
 
 ### Refinement Tools
 
-- **Concise**: Remove unnecessary words while preserving meaning
+**Prompt Refinement (8 tools):**
 - **Specific**: Add clarity and specificity to reduce ambiguity
+- **Concise**: Remove unnecessary words while preserving meaning
 - **Structured**: Improve organization with better sections and flow
 - **Context**: Add relevant background information and examples
 - **Constraints**: Add technical constraints and output specifications
 - **Roleplay**: Transform prompts with role-playing instructions
+- **Examples**: Include practical examples and demonstrations
+- **Error Handling**: Add robustness and error handling guidance
+
+**Content Refinement (8 tools):**
+- **Clarity**: Make content clearer and more understandable
+- **Professional**: Convert to professional business tone
+- **Engaging**: Make content more engaging and captivating
+- **Concise**: Reduce length while keeping key information
+- **Detailed**: Add more depth and comprehensive details
+- **Technical**: Enhance technical accuracy and terminology
+- **Creative**: Add creativity and artistic flair
+- **Persuasive**: Make content more persuasive and compelling
 
 ### Developer Experience
 
@@ -80,10 +93,15 @@ if (result.missingFields.length > 0) {
 }
 
 // Refine a prompt using AI
-const refinementResult = await refinePrompt("Write something about AI", "specific");
-console.log(refinementResult.refinedPrompt); // AI-enhanced, much more detailed prompt
-console.log(refinementResult.tokensUsed); // Tokens consumed by the AI
-console.log(refinementResult.latencyMs); // Response time in milliseconds
+const promptRefinement = await refinePrompt("Write something about AI", "specific");
+console.log(promptRefinement.refinedPrompt); // AI-enhanced, much more detailed prompt
+console.log(promptRefinement.tokensUsed); // Tokens consumed by the AI
+console.log(promptRefinement.latencyMs); // Response time in milliseconds
+
+// Refine content using AI
+const contentRefinement = await refineContent("Our app is good and helps users", "professional");
+console.log(contentRefinement.refinedContent); // Professional business tone
+console.log(contentRefinement.refinementTool); // Tool information
 ```
 
 ### Running as an API Server
@@ -103,8 +121,10 @@ The API server provides the following endpoints:
 - `GET /health` - Health check endpoint
 - `GET /api-docs` - Interactive Swagger documentation
 - `POST /generate` - Generate prompts from templates
-- `POST /refine` - Refine prompts using AI
-- `GET /refine/types` - Get available refinement types
+- `POST /refine/prompt` - Refine prompts using AI (8 specialized tools)
+- `POST /refine/content` - Refine general content using AI (8 specialized tools)
+- `GET /refine/types` - Get available refinement types for both prompts and content
+- `POST /refine` - Legacy prompt refinement endpoint (backward compatibility)
 - `POST /search` - Find matching prompts using semantic search
 
 Visit `http://localhost:3000/api-docs` to explore the interactive API documentation.
@@ -378,17 +398,42 @@ console.log("Latency:", result.latencyMs, "ms");
 ### Using Refinement Tools
 
 ```typescript
-import { refinerTools } from "@eprompt/prompt-engine";
+import { 
+  promptRefinerTools, 
+  contentRefinerTools,
+  refinePrompt,
+  refineContent
+} from "@eprompt/prompt-engine";
 
-// Get all available refinement tools
+// Get all available prompt refinement tools
 console.log(
-  "Available tools:",
-  refinerTools.map((t) => t.name)
+  "Available prompt tools:",
+  promptRefinerTools.map((t) => `${t.name} (${t.id})`)
 );
 
-// Use a specific refinement tool
-const specificTool = refinerTools.find((t) => t.id === "specific");
-const originalPrompt = "Write something about AI";
+// Get all available content refinement tools
+console.log(
+  "Available content tools:",
+  contentRefinerTools.map((t) => `${t.name} (${t.id})`)
+);
+
+// Refine a prompt for better structure
+const promptResult = await refinePrompt(
+  "Create a function that processes data",
+  "structured"
+);
+console.log("Refined prompt:", promptResult.refinedPrompt);
+
+// Refine content for professional tone
+const contentResult = await refineContent(
+  "Hey! Our app is super cool and does amazing stuff",
+  "professional"
+);
+console.log("Professional content:", contentResult.refinedContent);
+
+// Use a specific refinement tool manually
+const specificTool = promptRefinerTools.find((t) => t.id === "examples");
+const originalPrompt = "Write unit tests";
 const metaPrompt = `${specificTool.prompt}\n\nOriginal Prompt: "${originalPrompt}"`;
 
 // Use with AI to get refined prompt
@@ -404,6 +449,36 @@ const refinedResult = await generateAndRunPrompt(
   {},
   modelConfig
 );
+```
+
+### Content Refinement Examples
+
+```typescript
+import { refineContent, getContentRefinementTypes } from "@eprompt/prompt-engine";
+
+// Get all available content refinement types
+const contentTypes = getContentRefinementTypes();
+console.log("Content refinement types:", contentTypes);
+
+// Example: Make technical content more engaging
+const technicalContent = "Machine learning algorithms analyze data patterns to make predictions";
+const engagingResult = await refineContent(technicalContent, "engaging");
+console.log("Engaging version:", engagingResult.refinedContent);
+
+// Example: Convert casual content to professional
+const casualContent = "Our startup is doing pretty well and growing fast";
+const professionalResult = await refineContent(casualContent, "professional");
+console.log("Professional version:", professionalResult.refinedContent);
+
+// Example: Add detail to brief content
+const briefContent = "AI helps businesses";
+const detailedResult = await refineContent(briefContent, "detailed");
+console.log("Detailed version:", detailedResult.refinedContent);
+
+// Example: Make content more persuasive
+const plainContent = "Consider using our software solution";
+const persuasiveResult = await refineContent(plainContent, "persuasive");
+console.log("Persuasive version:", persuasiveResult.refinedContent);
 ```
 
 ### Custom Template Creation

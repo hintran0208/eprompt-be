@@ -1,5 +1,12 @@
 import { Router, Request, Response } from "express";
-import { refinePrompt, getRefinementTypes, refinerTools } from "../engine";
+import { 
+  refinePrompt, 
+  refineContent,
+  getPromptRefinementTypes, 
+  getContentRefinementTypes,
+  promptRefinerTools,
+  contentRefinerTools
+} from "../engine";
 import type { ModelConfig } from "../engine/types";
 
 const router = Router();
@@ -8,9 +15,9 @@ const router = Router();
  * @swagger
  * /refine/types:
  *   get:
- *     summary: Get available refinement types
- *     description: Returns all available refinement types and tools
- *     tags: [Prompt Refinement]
+ *     summary: Get all available refinement types
+ *     description: Returns all available refinement types and tools for both prompts and content
+ *     tags: [Refinement]
  *     responses:
  *       200:
  *         description: List of available refinement types and tools
@@ -19,26 +26,52 @@ const router = Router();
  *             schema:
  *               type: object
  *               properties:
- *                 types:
- *                   type: array
- *                   items:
- *                     type: string
- *                   description: Available refinement types
- *                 tools:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
+ *                 prompt:
+ *                   type: object
+ *                   properties:
+ *                     types:
+ *                       type: array
+ *                       items:
  *                         type: string
- *                       name:
+ *                       description: Available prompt refinement types
+ *                     tools:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                           icon:
+ *                             type: string
+ *                           description:
+ *                             type: string
+ *                           color:
+ *                             type: string
+ *                 content:
+ *                   type: object
+ *                   properties:
+ *                     types:
+ *                       type: array
+ *                       items:
  *                         type: string
- *                       icon:
- *                         type: string
- *                       description:
- *                         type: string
- *                       color:
- *                         type: string
+ *                       description: Available content refinement types
+ *                     tools:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                           icon:
+ *                             type: string
+ *                           description:
+ *                             type: string
+ *                           color:
+ *                             type: string
  *       500:
  *         description: Internal server error
  *         content:
@@ -46,18 +79,32 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-// GET /refine/types - Get available refinement types
+// GET /refine/types - Get all available refinement types
 router.get("/types", (req: Request, res: Response) => {
   try {
-    const types = getRefinementTypes();
-    const tools = refinerTools.map((tool) => ({
+    const promptTypes = getPromptRefinementTypes();
+    const contentTypes = getContentRefinementTypes();
+    
+    const promptTools = promptRefinerTools.map((tool) => ({
       id: tool.id,
       name: tool.name,
       icon: tool.icon,
       description: tool.description,
       color: tool.color,
     }));
-    res.json({ types, tools });
+    
+    const contentTools = contentRefinerTools.map((tool) => ({
+      id: tool.id,
+      name: tool.name,
+      icon: tool.icon,
+      description: tool.description,
+      color: tool.color,
+    }));
+    
+    res.json({ 
+      prompt: { types: promptTypes, tools: promptTools },
+      content: { types: contentTypes, tools: contentTools }
+    });
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : "Internal error" });
   }
@@ -65,7 +112,7 @@ router.get("/types", (req: Request, res: Response) => {
 
 /**
  * @swagger
- * /refine:
+ * /refine/prompt:
  *   post:
  *     summary: Refine a prompt using AI
  *     description: Refines an existing prompt using AI with specified refinement type
@@ -112,9 +159,18 @@ router.get("/types", (req: Request, res: Response) => {
  *                 refinedPrompt:
  *                   type: string
  *                   description: The refined prompt
- *                 metadata:
+ *                 originalPrompt:
+ *                   type: string
+ *                   description: The original prompt
+ *                 refinementTool:
  *                   type: object
- *                   description: Additional metadata about the refinement
+ *                   description: Information about the refinement tool used
+ *                 tokensUsed:
+ *                   type: number
+ *                   description: Number of AI tokens used
+ *                 latencyMs:
+ *                   type: number
+ *                   description: Processing time in milliseconds
  *       400:
  *         description: Bad request - missing or invalid parameters
  *         content:
@@ -128,7 +184,172 @@ router.get("/types", (req: Request, res: Response) => {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-// POST /refine - Refine a prompt using AI
+// POST /refine/prompt - Refine a prompt using AI
+router.post("/prompt", async (req: Request, res: Response) => {
+  const { prompt, refinementType = "specific", modelConfig } = req.body;
+
+  if (typeof prompt !== "string") {
+    return res.status(400).json({ error: "Missing or invalid prompt" });
+  }
+
+  if (typeof refinementType !== "string") {
+    return res.status(400).json({ error: "Invalid refinementType - must be a string" });
+  }
+
+  if (modelConfig && typeof modelConfig !== "object") {
+    return res.status(400).json({ error: "Invalid modelConfig - must be an object" });
+  }
+
+  try {
+    const result = await refinePrompt(prompt, refinementType, modelConfig as ModelConfig);
+    res.json(result);
+  } catch (err) {
+    if (err instanceof Error && err.message.includes("Unknown prompt refinement type")) {
+      return res.status(400).json({ error: err.message });
+    }
+    res.status(500).json({ error: err instanceof Error ? err.message : "Internal error" });
+  }
+});
+
+/**
+ * @swagger
+ * /refine/content:
+ *   post:
+ *     summary: Refine custom content using AI
+ *     description: Refines existing content using AI with specified refinement type
+ *     tags: [Content Refinement]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - content
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 description: The content to refine
+ *                 example: "This is some content that needs improvement"
+ *               refinementType:
+ *                 type: string
+ *                 description: Type of refinement to apply
+ *                 default: "clarity"
+ *                 example: "clarity"
+ *               modelConfig:
+ *                 type: object
+ *                 description: Configuration for the AI model
+ *                 properties:
+ *                   model:
+ *                     type: string
+ *                     example: "gpt-4"
+ *                   temperature:
+ *                     type: number
+ *                     example: 0.7
+ *                   maxTokens:
+ *                     type: number
+ *                     example: 1000
+ *     responses:
+ *       200:
+ *         description: Successfully refined content
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 refinedContent:
+ *                   type: string
+ *                   description: The refined content
+ *                 originalContent:
+ *                   type: string
+ *                   description: The original content
+ *                 refinementTool:
+ *                   type: object
+ *                   description: Information about the refinement tool used
+ *                 tokensUsed:
+ *                   type: number
+ *                   description: Number of AI tokens used
+ *                 latencyMs:
+ *                   type: number
+ *                   description: Processing time in milliseconds
+ *       400:
+ *         description: Bad request - missing or invalid parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+// POST /refine/content - Refine content using AI
+router.post("/content", async (req: Request, res: Response) => {
+  const { content, refinementType = "clarity", modelConfig } = req.body;
+
+  if (typeof content !== "string") {
+    return res.status(400).json({ error: "Missing or invalid content" });
+  }
+
+  if (typeof refinementType !== "string") {
+    return res.status(400).json({ error: "Invalid refinementType - must be a string" });
+  }
+
+  if (modelConfig && typeof modelConfig !== "object") {
+    return res.status(400).json({ error: "Invalid modelConfig - must be an object" });
+  }
+
+  try {
+    const result = await refineContent(content, refinementType, modelConfig as ModelConfig);
+    res.json(result);
+  } catch (err) {
+    if (err instanceof Error && err.message.includes("Unknown content refinement type")) {
+      return res.status(400).json({ error: err.message });
+    }
+    res.status(500).json({ error: err instanceof Error ? err.message : "Internal error" });
+  }
+});
+
+/**
+ * @swagger
+ * /refine:
+ *   post:
+ *     summary: Refine a prompt using AI (Legacy endpoint)
+ *     description: Legacy endpoint for prompt refinement. Use /refine/prompt instead.
+ *     deprecated: true
+ *     tags: [Prompt Refinement]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - prompt
+ *             properties:
+ *               prompt:
+ *                 type: string
+ *                 description: The prompt to refine
+ *                 example: "Write a story"
+ *               refinementType:
+ *                 type: string
+ *                 description: Type of refinement to apply
+ *                 default: "specific"
+ *                 example: "specific"
+ *               modelConfig:
+ *                 type: object
+ *                 description: Configuration for the AI model
+ *     responses:
+ *       200:
+ *         description: Successfully refined prompt
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Internal server error
+ */
+// POST /refine - Legacy endpoint for backward compatibility
 router.post("/", async (req: Request, res: Response) => {
   const { prompt, refinementType = "specific", modelConfig } = req.body;
 
@@ -148,7 +369,7 @@ router.post("/", async (req: Request, res: Response) => {
     const result = await refinePrompt(prompt, refinementType, modelConfig as ModelConfig);
     res.json(result);
   } catch (err) {
-    if (err instanceof Error && err.message.includes("Unknown refinement type")) {
+    if (err instanceof Error && err.message.includes("Unknown prompt refinement type")) {
       return res.status(400).json({ error: err.message });
     }
     res.status(500).json({ error: err instanceof Error ? err.message : "Internal error" });
