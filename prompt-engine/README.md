@@ -124,7 +124,6 @@ The API server provides the following endpoints:
 - `POST /refine/prompt` - Refine prompts using AI (8 specialized tools)
 - `POST /refine/content` - Refine general content using AI (8 specialized tools)
 - `GET /refine/types` - Get available refinement types for both prompts and content
-- `POST /refine` - Legacy prompt refinement endpoint (backward compatibility)
 - `POST /search` - Find matching prompts using semantic search
 
 Visit `http://localhost:3000/api-docs` to explore the interactive API documentation.
@@ -147,7 +146,7 @@ Welcome endpoint that provides API information and available endpoints.
   "endpoints": {
     "health": "/health",
     "generate": "/generate",
-    "refine": "/refine",
+    "refine": "/refine/prompt and /refine/content",
     "search": "/search",
     "docs": "/api-docs"
   },
@@ -215,9 +214,9 @@ Generate a prompt from a template and context.
 }
 ```
 
-#### POST /refine
+#### POST /refine/prompt
 
-Refine and optimize a prompt using AI-powered refinement tools.
+Refine and optimize a prompt using AI-powered prompt refinement tools.
 
 **Request:**
 
@@ -252,59 +251,173 @@ Refine and optimize a prompt using AI-powered refinement tools.
 }
 ```
 
-#### GET /refine/types
+#### POST /refine/content
 
-Get all available refinement types and tools.
+Refine and optimize general content using AI-powered content refinement tools.
+
+**Request:**
+
+```json
+{
+  "content": "Our app is good and helps users",
+  "refinementType": "professional",
+  "modelConfig": {
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 2000
+  }
+}
+```
 
 **Response:**
 
 ```json
 {
-  "types": ["concise", "specific", "structured", "context", "constraints", "roleplay"],
-  "tools": [
-    {
-      "id": "concise",
-      "name": "Make Concise",
-      "icon": "✂️",
-      "description": "Remove unnecessary words and make it shorter",
-      "color": "blue"
-    },
-    {
-      "id": "specific",
-      "name": "More Specific",
-      "icon": "🎯",
-      "description": "Add clarity and specificity to reduce ambiguity",
-      "color": "green"
-    },
-    {
-      "id": "structured",
-      "name": "Better Structure",
-      "icon": "🏗️",
-      "description": "Improve organization and readability",
-      "color": "indigo"
-    },
-    {
-      "id": "context",
-      "name": "Add Context",
-      "icon": "📋",
-      "description": "Add more comprehensive context and examples",
-      "color": "orange"
-    },
-    {
-      "id": "constraints",
-      "name": "Add Constraints",
-      "icon": "⚙️",
-      "description": "Add technical constraints and output format guidance",
-      "color": "gray"
-    },
-    {
-      "id": "roleplay",
-      "name": "Role-based",
-      "icon": "🎭",
-      "description": "Add role-playing elements and persona guidance",
-      "color": "purple"
-    }
-  ]
+  "refinedContent": "Our application delivers exceptional value by providing users with intuitive, reliable solutions that streamline their workflow and enhance productivity. Through carefully designed features and user-centric functionality, we enable our clients to achieve their goals more efficiently and effectively.",
+  "originalContent": "Our app is good and helps users",
+  "refinementTool": {
+    "id": "professional",
+    "name": "Professional Tone",
+    "icon": "💼",
+    "description": "Transform content to have a professional business tone",
+    "color": "blue"
+  },
+  "tokensUsed": 89,
+  "latencyMs": 980
+}
+```
+
+#### GET /refine/types
+
+Get all available refinement types and tools for both prompts and content.
+
+**Response:**
+
+```json
+{
+  "prompt": {
+    "types": ["specific", "concise", "structured", "context", "constraints", "roleplay", "examples", "error-handling"],
+    "tools": [
+      {
+        "id": "specific",
+        "name": "More Specific",
+        "icon": "🎯",
+        "description": "Add clarity and specificity to reduce ambiguity",
+        "color": "green"
+      },
+      {
+        "id": "concise",
+        "name": "Make Concise",
+        "icon": "✂️",
+        "description": "Remove unnecessary words and make it shorter",
+        "color": "blue"
+      },
+      {
+        "id": "structured",
+        "name": "Better Structure",
+        "icon": "🏗️",
+        "description": "Improve organization and readability",
+        "color": "yellow"
+      },
+      {
+        "id": "context",
+        "name": "Add Context",
+        "icon": "📋",
+        "description": "Add more comprehensive context and examples",
+        "color": "orange"
+      },
+      {
+        "id": "constraints",
+        "name": "Add Constraints",
+        "icon": "⚙️",
+        "description": "Add technical constraints and output format guidance",
+        "color": "gray"
+      },
+      {
+        "id": "roleplay",
+        "name": "Role-based",
+        "icon": "🎭",
+        "description": "Add role-playing elements and persona guidance",
+        "color": "purple"
+      },
+      {
+        "id": "examples",
+        "name": "Add Examples",
+        "icon": "💡",
+        "description": "Include practical examples and demonstrations",
+        "color": "cyan"
+      },
+      {
+        "id": "error-handling",
+        "name": "Error Handling",
+        "icon": "🛡️",
+        "description": "Add robustness and error handling guidance",
+        "color": "red"
+      }
+    ]
+  },
+  "content": {
+    "types": ["clarity", "professional", "engaging", "concise", "detailed", "technical", "creative", "persuasive"],
+    "tools": [
+      {
+        "id": "clarity",
+        "name": "Improve Clarity",
+        "icon": "💎",
+        "description": "Make content clearer and easier to understand",
+        "color": "blue"
+      },
+      {
+        "id": "professional",
+        "name": "Professional Tone",
+        "icon": "💼",
+        "description": "Transform content to have a professional business tone",
+        "color": "navy"
+      },
+      {
+        "id": "engaging",
+        "name": "More Engaging",
+        "icon": "✨",
+        "description": "Make content more interesting and captivating",
+        "color": "purple"
+      },
+      {
+        "id": "concise",
+        "name": "Make Concise",
+        "icon": "✂️",
+        "description": "Reduce length while maintaining key messages",
+        "color": "green"
+      },
+      {
+        "id": "detailed",
+        "name": "Add Detail",
+        "icon": "🔍",
+        "description": "Expand content with more comprehensive information",
+        "color": "orange"
+      },
+      {
+        "id": "technical",
+        "name": "Technical Precision",
+        "icon": "⚙️",
+        "description": "Add technical accuracy and specialized terminology",
+        "color": "gray"
+      },
+      {
+        "id": "creative",
+        "name": "Creative Enhancement",
+        "icon": "🎨",
+        "description": "Add creativity and innovative expression",
+        "color": "pink"
+      },
+      {
+        "id": "persuasive",
+        "name": "Persuasive Impact",
+        "icon": "🎯",
+        "description": "Make content more convincing and influential",
+        "color": "red"
+      }
+    ]
+  }
 }
 ```
 

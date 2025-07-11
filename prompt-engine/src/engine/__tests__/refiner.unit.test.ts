@@ -62,13 +62,11 @@ describe('refiner module', () => {
       expect(result.refinementTool.id).toBe('structured');
       expect(result.refinementTool.name).toBe('Better Structure');
       expect(result.refinementTool.icon).toBe('🏗️');
-    });
-
-    it('throws error for unknown refinement type', async () => {
+    });    it('throws error for unknown refinement type', async () => {
       await expect(refinePrompt(originalPrompt, 'unknown')).rejects.toThrow(
-        'Unknown refinement type: unknown. Available types: concise, specific, structured, context, constraints, roleplay'
+        'Unknown prompt refinement type: unknown. Available types: specific, concise, structured, context, constraints, roleplay, examples, error-handling'
       );
-    });    it('accepts custom model configuration using default OpenAI config', async () => {
+    });it('accepts custom model configuration using default OpenAI config', async () => {
       const defaultModelConfig = {
         provider: 'openai' as const,
         model: DEFAULT_OPENAI_CONFIG.model!,
