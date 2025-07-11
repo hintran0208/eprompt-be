@@ -1,8 +1,10 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import generateRoute from "./routes/generate";
-import refineRoute from "./routes/refine";
+import mongoose from 'mongoose';
+
+import registerRoutes from './routes';
+
 import { specs, swaggerUi } from "./config/swagger";
 
 dotenv.config();
@@ -22,6 +24,11 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// MongoDB connection
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/eprompt')
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 // Swagger Documentation
 app.use(
@@ -85,8 +92,7 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-app.use("/generate", generateRoute);
-app.use("/refine", refineRoute);
+registerRoutes(app); // Register all routes
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 app.listen(PORT, () => {
