@@ -79,6 +79,47 @@ const options = {
             },
           },
         },
+        SemanticSearchTemplate: {
+          type: "object",
+          required: ["text"],
+          properties: {
+            text: {
+              type: "string",
+              description: "Semantic search query",
+            },
+          },
+          example: {
+            text: "{{search question}}",
+          },
+        },
+        SemanticSearchOptions: {
+          type: "object",
+          topK: {
+            type: "number",
+            description: "number of closest matches"
+          },
+          additionalProperties: true,
+          example: {
+            topK: 1,
+          },
+        },
+        SemanticSearchResult: {
+          type: "object",
+          properties: {
+            text: {
+              type: "string",
+              description: "semantic search result"
+            },
+            score: {
+              type: "number",
+              description: "semantic similarity score",
+            },
+          },
+          example: {
+            text: "This is the result",
+            score: 0.69,
+          },
+        },
         Error: {
           type: "object",
           properties: {

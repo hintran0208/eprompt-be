@@ -105,6 +105,7 @@ The API server provides the following endpoints:
 - `POST /generate` - Generate prompts from templates
 - `POST /refine` - Refine prompts using AI
 - `GET /refine/types` - Get available refinement types
+- `POST /search` - Find matching prompts using semantic search
 
 Visit `http://localhost:3000/api-docs` to explore the interactive API documentation.
 
@@ -127,6 +128,7 @@ Welcome endpoint that provides API information and available endpoints.
     "health": "/health",
     "generate": "/generate",
     "refine": "/refine",
+    "search": "/search",
     "docs": "/api-docs"
   },
   "timestamp": "2025-07-10T12:00:00.000Z"
@@ -284,6 +286,35 @@ Get all available refinement types and tools.
     }
   ]
 }
+```
+
+#### POST /search
+
+Semantic search from a database using a natural language query.
+
+**Request:**
+
+```json
+{
+  "query": {
+    "text": "Prompt for text summarization"
+  },
+  "options": {
+    "topK": 5
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "results": [
+    {
+      "text": "This is the result",
+      "score": 0.69
+    },
+  ],
 }
 ```
 
@@ -424,6 +455,7 @@ src/engine/__tests__/
 ├── generator.unit.test.ts      # Core generation logic
 ├── refiner.unit.test.ts        # AI-powered refinement (unit tests)
 ├── refinerTools.unit.test.ts   # Refinement tool definitions
+├── search.unit.test.ts         # Semantic search tests
 ├── openai.unit.test.ts         # OpenAI client functionality
 ├── openai.integration.test.ts  # OpenAI integration tests
 ├── integration.api.test.ts     # API endpoint integration
