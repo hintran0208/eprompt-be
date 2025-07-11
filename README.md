@@ -17,7 +17,7 @@ eprompt-be/
 │   │   │   └── __tests__/      # Comprehensive test suite
 │   │   ├── routes/         # Express API routes
 │   │   │   ├── generate.ts     # POST /generate endpoint
-│   │   │   └── refine.ts       # POST /refine endpoint
+│   │   │   ├── refine.ts       # POST /refine/prompt and /refine/content endpoints
 │   │   │   └── search.ts       # POST /search endpoint
 │   │   └── server.ts       # Express server setup
 │   ├── package.json        # Dependencies and scripts
@@ -127,8 +127,8 @@ Generates a prompt from a template and context variables.
 - `400`: Missing or invalid template/context
 - `500`: Internal server error
 
-#### POST /refine
-Refines a prompt using AI-powered refinement tools to improve clarity, structure, and effectiveness.
+#### POST /refine/prompt
+Refines a prompt using AI-powered prompt refinement tools to improve clarity, structure, and effectiveness.
 
 **Request Body:**
 ```json
@@ -161,29 +161,84 @@ Refines a prompt using AI-powered refinement tools to improve clarity, structure
 }
 ```
 
-#### GET /refine/types
-Gets all available refinement types and tools.
+#### POST /refine/content
+Refines general content using AI-powered content refinement tools to improve tone, style, and effectiveness.
+
+**Request Body:**
+```json
+{
+  "content": "Our app is good and helps users",
+  "refinementType": "professional",
+  "modelConfig": {
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 2000
+  }
+}
+```
 
 **Response:**
 ```json
 {
-  "types": ["concise", "specific", "structured", "context", "constraints", "roleplay"],
-  "tools": [
-    {
-      "id": "concise",
-      "name": "Make Concise",
-      "icon": "✂️",
-      "description": "Remove unnecessary words and make it shorter",
-      "color": "blue"
-    },
-    {
-      "id": "specific",
-      "name": "More Specific",
-      "icon": "🎯",
-      "description": "Add clarity and specificity to reduce ambiguity",
-      "color": "green"
-    }
-  ]
+  "refinedContent": "Our application delivers exceptional value by providing users with intuitive, reliable solutions that streamline their workflow and enhance productivity.",
+  "originalContent": "Our app is good and helps users",
+  "refinementTool": {
+    "id": "professional",
+    "name": "Professional Tone",
+    "icon": "💼",
+    "description": "Transform content to have a professional business tone",
+    "color": "blue"
+  },
+  "tokensUsed": 89,
+  "latencyMs": 980
+}
+```
+
+#### GET /refine/types
+Gets all available refinement types and tools for both prompts and content.
+
+**Response:**
+```json
+{
+  "prompt": {
+    "types": ["specific", "concise", "structured", "context", "constraints", "roleplay", "examples", "error-handling"],
+    "tools": [
+      {
+        "id": "specific",
+        "name": "More Specific",
+        "icon": "🎯",
+        "description": "Add clarity and specificity to reduce ambiguity",
+        "color": "green"
+      },
+      {
+        "id": "concise",
+        "name": "Make Concise",
+        "icon": "✂️",
+        "description": "Remove unnecessary words and make it shorter",
+        "color": "blue"
+      }
+    ]
+  },
+  "content": {
+    "types": ["clarity", "professional", "engaging", "concise", "detailed", "technical", "creative", "persuasive"],
+    "tools": [
+      {
+        "id": "clarity",
+        "name": "Improve Clarity",
+        "icon": "💎",
+        "description": "Make content clearer and easier to understand",
+        "color": "blue"
+      },
+      {
+        "id": "professional",
+        "name": "Professional Tone",
+        "icon": "💼",
+        "description": "Transform content to have a professional business tone",
+        "color": "navy"
+      }
+    ]
+  }
 }
 ```
 
@@ -213,11 +268,27 @@ curl -X POST http://localhost:3000/generate \
 
 ### Prompt Refinement
 ```bash
-curl -X POST http://localhost:3000/refine \
+curl -X POST http://localhost:3000/refine/prompt \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "Write something about AI",
     "refinementType": "specific",
+    "modelConfig": {
+      "provider": "openai",
+      "model": "GPT-4o",
+      "temperature": 0.7,
+      "maxTokens": 2000
+    }
+  }'
+```
+
+### Content Refinement
+```bash
+curl -X POST http://localhost:3000/refine/content \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "Our app is good and helps users",
+    "refinementType": "professional",
     "modelConfig": {
       "provider": "openai",
       "model": "GPT-4o",

@@ -1,3 +1,4 @@
+import { describe, it, expect } from '@jest/globals';
 import { generatePrompt, createTemplate } from '../generator';
 
 describe('generator module', () => {

@@ -1,15 +1,23 @@
+import { describe, it, expect, jest } from '@jest/globals';
 import { refinePrompt, getRefinementTypes, refinerTools } from '../refiner';
 import { DEFAULT_OPENAI_CONFIG } from '../openai';
 
 // Mock the generateAndRunPrompt to avoid actual API calls in unit tests
-jest.mock('../generator', () => ({
-  ...jest.requireActual('../generator'),
-  generateAndRunPrompt: jest.fn().mockResolvedValue({
-    result: 'This is a refined and improved prompt with better clarity.',
-    tokensUsed: 50,
-    latencyMs: 1000
-  })
-}));
+jest.mock('../generator');
+
+const mockGeneratedResult = {
+  prompt: 'Mock prompt',
+  result: 'This is a refined and improved prompt with better clarity.',
+  sections: {},
+  tokensUsed: 50,
+  latencyMs: 1000,
+  modelConfig: { provider: 'openai', model: 'gpt-4' },
+  timestamp: new Date()
+};
+
+// Import and set up the mock after the module is mocked
+const { generateAndRunPrompt } = require('../generator');
+(generateAndRunPrompt as any).mockResolvedValue(mockGeneratedResult);
 
 describe('refiner module', () => {
   describe('getRefinementTypes', () => {
@@ -54,13 +62,11 @@ describe('refiner module', () => {
       expect(result.refinementTool.id).toBe('structured');
       expect(result.refinementTool.name).toBe('Better Structure');
       expect(result.refinementTool.icon).toBe('🏗️');
-    });
-
-    it('throws error for unknown refinement type', async () => {
+    });    it('throws error for unknown refinement type', async () => {
       await expect(refinePrompt(originalPrompt, 'unknown')).rejects.toThrow(
-        'Unknown refinement type: unknown. Available types: concise, specific, structured, context, constraints, roleplay'
+        'Unknown prompt refinement type: unknown. Available types: specific, concise, structured, context, constraints, roleplay, examples, error-handling'
       );
-    });    it('accepts custom model configuration using default OpenAI config', async () => {
+    });it('accepts custom model configuration using default OpenAI config', async () => {
       const defaultModelConfig = {
         provider: 'openai' as const,
         model: DEFAULT_OPENAI_CONFIG.model!,

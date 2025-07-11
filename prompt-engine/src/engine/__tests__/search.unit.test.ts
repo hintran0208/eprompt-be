@@ -1,3 +1,4 @@
+import { describe, it, expect } from '@jest/globals';
 import { generateSearch } from '../search';
 
 describe('search module', () => {

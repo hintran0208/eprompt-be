@@ -9,13 +9,13 @@ export async function refinePrompt(
 ): Promise<{
   refinedPrompt: string;
   originalPrompt: string;
-  refinementTool: RefinerTool;
+  refinementTool: PromptRefinerTool;
   tokensUsed?: number;
   latencyMs?: number;
 }> {
-  const tool = refinerTools.find(t => t.id === refinementType);
+  const tool = promptRefinerTools.find(t => t.id === refinementType);
   if (!tool) {
-    throw new Error(`Unknown refinement type: ${refinementType}. Available types: ${refinerTools.map(t => t.id).join(', ')}`);
+    throw new Error(`Unknown prompt refinement type: ${refinementType}. Available types: ${promptRefinerTools.map(t => t.id).join(', ')}`);
   }
 
   const config = modelConfig || {
@@ -34,7 +34,13 @@ Original Prompt:
 ${prompt}
 """
 
-Please provide only the improved prompt as your response, without any explanations or additional text. Focus on making it a better prompt for AI systems while maintaining the original intent.`;
+CRITICAL INSTRUCTIONS:
+- Return ONLY the refined prompt text
+- Do NOT include any explanations, commentary, or meta-text
+- Do NOT add phrases like "Here is the refined prompt:", "Refined prompt:", or similar
+- Do NOT add quotation marks around the response
+- Do NOT include any introduction or conclusion
+- Output the prompt improvement directly without any wrapper text`;
 
   const template = createTemplate({
     id: 'refine-prompt',
@@ -56,11 +62,75 @@ Please provide only the improved prompt as your response, without any explanatio
   };
 }
 
-export function getRefinementTypes(): string[] {
-  return refinerTools.map(tool => tool.id);
+export async function refineContent(
+  content: string,
+  refinementType: string = 'clarity',
+  modelConfig?: ModelConfig
+): Promise<{
+  refinedContent: string;
+  originalContent: string;
+  refinementTool: ContentRefinerTool;
+  tokensUsed?: number;
+  latencyMs?: number;
+}> {
+  const tool = contentRefinerTools.find(t => t.id === refinementType);
+  if (!tool) {
+    throw new Error(`Unknown content refinement type: ${refinementType}. Available types: ${contentRefinerTools.map(t => t.id).join(', ')}`);
+  }
+
+  const config = modelConfig || {
+    provider: 'openai' as const,
+    model: DEFAULT_OPENAI_CONFIG.model!,
+    temperature: DEFAULT_OPENAI_CONFIG.temperature!,
+    maxTokens: DEFAULT_OPENAI_CONFIG.maxTokens!,
+    customApiHost: DEFAULT_OPENAI_CONFIG.apiHost,
+    customApiKey: DEFAULT_OPENAI_CONFIG.apiKey
+  };
+
+  const metaPrompt = `${tool.prompt}
+
+Original Content:
+"""
+${content}
+"""
+
+CRITICAL INSTRUCTIONS:
+- Return ONLY the refined content text
+- Do NOT include any explanations, commentary, or meta-text
+- Do NOT add phrases like "Here is the refined content:", "Refined content:", or similar
+- Do NOT add quotation marks around the response
+- Do NOT include any introduction or conclusion
+- Output the content improvement directly without any wrapper text`;
+
+  const template = createTemplate({
+    id: 'refine-content',
+    name: 'Content Refinement',
+    description: `Refine content using ${tool.name}`,
+    template: metaPrompt,
+    role: 'Content Editor',
+    useCase: 'Content Refinement'
+  });
+
+  const result = await generateAndRunPrompt(template, {}, config);
+
+  return {
+    refinedContent: result.result.trim(),
+    originalContent: content,
+    refinementTool: tool,
+    tokensUsed: result.tokensUsed,
+    latencyMs: result.latencyMs
+  };
 }
 
-export interface RefinerTool {
+export function getPromptRefinementTypes(): string[] {
+  return promptRefinerTools.map(tool => tool.id);
+}
+
+export function getContentRefinementTypes(): string[] {
+  return contentRefinerTools.map(tool => tool.id);
+}
+
+export interface PromptRefinerTool {
   id: string;
   name: string;
   icon: string;
@@ -69,15 +139,19 @@ export interface RefinerTool {
   color: string;
 }
 
-export const refinerTools: RefinerTool[] = [
-  {
-    id: 'concise',
-    name: 'Make Concise',
-    icon: '✂️',
-    prompt: 'Optimize the following prompt to be more concise while preserving all key information and instructions:',
-    description: 'Remove unnecessary words and make it shorter',
-    color: 'blue'
-  },
+export interface ContentRefinerTool {
+  id: string;
+  name: string;
+  icon: string;
+  prompt: string;
+  description: string;
+  color: string;
+}
+
+// Legacy interface for backward compatibility
+export interface RefinerTool extends PromptRefinerTool {}
+
+export const promptRefinerTools: PromptRefinerTool[] = [
   {
     id: 'specific',
     name: 'More Specific',
@@ -85,6 +159,14 @@ export const refinerTools: RefinerTool[] = [
     prompt: 'Enhance the following prompt with more specific instructions and clearer expectations:',
     description: 'Add clarity and specificity to reduce ambiguity',
     color: 'green'
+  },
+  {
+    id: 'concise',
+    name: 'Make Concise',
+    icon: '✂️',
+    prompt: 'Optimize the following prompt to be more concise while preserving all key information and instructions:',
+    description: 'Remove unnecessary words and make it shorter',
+    color: 'blue'
   },
   {
     id: 'structured',
@@ -117,9 +199,107 @@ export const refinerTools: RefinerTool[] = [
     prompt: 'Transform the following prompt to include role-playing instructions and persona-based guidance:',
     description: 'Add role-playing elements and persona guidance',
     color: 'purple'
+  },
+  {
+    id: 'examples',
+    name: 'Add Examples',
+    icon: '💡',
+    prompt: 'Enhance the following prompt by adding relevant examples and sample outputs to clarify expectations:',
+    description: 'Include practical examples and demonstrations',
+    color: 'yellow'
+  },
+  {
+    id: 'error-handling',
+    name: 'Error Handling',
+    icon: '🛡️',
+    prompt: 'Improve the following prompt by adding instructions for handling edge cases, errors, and unexpected inputs:',
+    description: 'Add robustness and error handling guidance',
+    color: 'red'
   }
 ];
 
+export const contentRefinerTools: ContentRefinerTool[] = [
+  {
+    id: 'clarity',
+    name: 'Improve Clarity',
+    icon: '🔍',
+    prompt: 'Enhance the following content to make it clearer, more understandable, and easier to read:',
+    description: 'Make content clearer and more understandable',
+    color: 'blue'
+  },
+  {
+    id: 'professional',
+    name: 'Professional Tone',
+    icon: '💼',
+    prompt: 'Rewrite the following content with a professional, formal tone suitable for business communication:',
+    description: 'Convert to professional business tone',
+    color: 'navy'
+  },
+  {
+    id: 'engaging',
+    name: 'More Engaging',
+    icon: '✨',
+    prompt: 'Transform the following content to be more engaging, interesting, and compelling for readers:',
+    description: 'Make content more engaging and captivating',
+    color: 'purple'
+  },
+  {
+    id: 'concise',
+    name: 'Make Concise',
+    icon: '✂️',
+    prompt: 'Condense the following content to be more concise while retaining all important information:',
+    description: 'Reduce length while keeping key information',
+    color: 'green'
+  },
+  {
+    id: 'detailed',
+    name: 'Add Detail',
+    icon: '📝',
+    prompt: 'Expand the following content with more detail, examples, and comprehensive information:',
+    description: 'Add more depth and comprehensive details',
+    color: 'orange'
+  },
+  {
+    id: 'technical',
+    name: 'Technical Accuracy',
+    icon: '⚙️',
+    prompt: 'Improve the following content for technical accuracy, precision, and proper terminology:',
+    description: 'Enhance technical accuracy and terminology',
+    color: 'gray'
+  },
+  {
+    id: 'creative',
+    name: 'Creative Style',
+    icon: '🎨',
+    prompt: 'Rewrite the following content with a more creative, imaginative, and artistic approach:',
+    description: 'Add creativity and artistic flair',
+    color: 'pink'
+  },
+  {
+    id: 'persuasive',
+    name: 'Persuasive',
+    icon: '🎯',
+    prompt: 'Transform the following content to be more persuasive, convincing, and action-oriented:',
+    description: 'Make content more persuasive and compelling',
+    color: 'red'
+  }
+];
+
+// Legacy exports for backward compatibility
+export const refinerTools: RefinerTool[] = promptRefinerTools;
+
+export function getRefinementTypes(): string[] {
+  return getPromptRefinementTypes();
+}
+
 export function getRefinerTools(): RefinerTool[] {
-  return refinerTools;
+  return promptRefinerTools;
+}
+
+export function getPromptRefinerTools(): PromptRefinerTool[] {
+  return promptRefinerTools;
+}
+
+export function getContentRefinerTools(): ContentRefinerTool[] {
+  return contentRefinerTools;
 }
