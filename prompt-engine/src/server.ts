@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import generateRoute from "./routes/generate";
 import refineRoute from "./routes/refine";
 import searchRoute from "./routes/search";
+import aiGenerateRoute from "./routes/ai-generate";
 import { specs, swaggerUi } from "./config/swagger";
 
 dotenv.config();
@@ -55,11 +56,12 @@ app.get("/", (req, res) => {
   res.status(200).json({
     message: "Welcome to ePrompt API - Prompt Generation & Refinement Engine",
     version: "1.0.0",
-    description: "A powerful API for generating and refining prompts using AI",
-    endpoints: {
+    description: "A powerful API for generating and refining prompts using AI",    endpoints: {
       health: "/health",
       generate: "/generate",
+      "ai-generate": "/ai-generate",
       refine: "/refine",
+      search: "/search",
       docs: "/api-docs",
     },
     timestamp: new Date().toISOString(),
@@ -87,6 +89,7 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/generate", generateRoute);
+app.use("/ai-generate", aiGenerateRoute);
 app.use("/refine", refineRoute);
 app.use("/search", searchRoute);
 

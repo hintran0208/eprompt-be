@@ -4,6 +4,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import generateRoute from '../../routes/generate';
 import refineRoute from '../../routes/refine';
+import aiGenerateRoute from '../../routes/ai-generate';
 import { createTemplate } from '../generator';
 import { DEFAULT_OPENAI_CONFIG } from '../openai';
 
@@ -206,6 +207,7 @@ dotenv.config({ path: '../../.env.example' });
 const app = express();
 app.use(express.json());
 app.use('/generate', generateRoute);
+app.use('/ai-generate', aiGenerateRoute);
 app.use('/refine', refineRoute);
 
 describe('integration: API Endpoints', () => {
@@ -604,9 +606,7 @@ describe('integration: API Endpoints', () => {
         expect(typeof tool.description).toBe('string');
         expect(typeof tool.color).toBe('string');
       });
-    });
-
-    it('ensures tool IDs match the types arrays', async () => {
+    });    it('ensures tool IDs match the types arrays', async () => {
       const res = await request(app)
         .get('/refine/types');
       
@@ -617,6 +617,201 @@ describe('integration: API Endpoints', () => {
       // Verify tool IDs match the types arrays
       expect(promptToolIds.sort()).toEqual(res.body.prompt.types.sort());
       expect(contentToolIds.sort()).toEqual(res.body.content.types.sort());
+    });
+  });
+
+  describe('POST /ai-generate', () => {
+    it('generates AI response from simple text', async () => {
+      const res = await request(app)
+        .post('/ai-generate')
+        .send({ text: 'Write a brief introduction about artificial intelligence.' });
+      
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty('text');
+      expect(res.body).toHaveProperty('result');
+      expect(res.body).toHaveProperty('tokensUsed');
+      expect(res.body).toHaveProperty('latencyMs');
+      expect(res.body).toHaveProperty('modelConfig');
+      expect(res.body).toHaveProperty('timestamp');
+      
+      expect(res.body.text).toBe('Write a brief introduction about artificial intelligence.');
+      expect(typeof res.body.result).toBe('string');
+      expect(res.body.result.length).toBeGreaterThan(0);
+      expect(typeof res.body.tokensUsed).toBe('number');
+      expect(typeof res.body.latencyMs).toBe('number');
+      expect(res.body.modelConfig.provider).toBe('openai');
+      expect(res.body.modelConfig.model).toBe(DEFAULT_OPENAI_CONFIG.model);
+    });
+
+    it('accepts custom model configuration', async () => {
+      const modelConfig = {
+        provider: 'openai',
+        model: 'GPT-4o',
+        temperature: 0.5,
+        maxTokens: 1500,
+        customApiHost: DEFAULT_OPENAI_CONFIG.apiHost,
+        customApiKey: DEFAULT_OPENAI_CONFIG.apiKey
+      };
+      
+      const res = await request(app)
+        .post('/ai-generate')
+        .send({ 
+          text: 'Explain machine learning in simple terms.',
+          modelConfig 
+        });
+      
+      expect(res.status).toBe(200);
+      expect(res.body.modelConfig.temperature).toBe(0.5);
+      expect(res.body.modelConfig.maxTokens).toBe(1500);
+      expect(res.body.modelConfig.model).toBe('GPT-4o');
+    });
+
+    it('accepts system prompt', async () => {
+      const res = await request(app)
+        .post('/ai-generate')
+        .send({ 
+          text: 'What is the capital of France?',
+          systemPrompt: 'You are a helpful geography teacher. Provide clear and educational answers.'
+        });
+      
+      expect(res.status).toBe(200);
+      expect(res.body.result).toBeDefined();
+      expect(typeof res.body.result).toBe('string');
+    });
+
+    it('returns 400 for missing text', async () => {
+      const res = await request(app)
+        .post('/ai-generate')
+        .send({});
+      
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Missing or invalid text - must be a non-empty string');
+    });
+
+    it('returns 400 for empty text', async () => {
+      const res = await request(app)
+        .post('/ai-generate')
+        .send({ text: '' });
+      
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Missing or invalid text - must be a non-empty string');
+    });
+
+    it('returns 400 for whitespace-only text', async () => {
+      const res = await request(app)
+        .post('/ai-generate')
+        .send({ text: '   \n\t   ' });
+      
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Missing or invalid text - must be a non-empty string');
+    });
+
+    it('returns 400 for invalid text type', async () => {
+      const res = await request(app)
+        .post('/ai-generate')
+        .send({ text: 123 });
+      
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Missing or invalid text - must be a non-empty string');
+    });
+
+    it('returns 400 for invalid model config', async () => {
+      const res = await request(app)
+        .post('/ai-generate')
+        .send({ 
+          text: 'Test text',
+          modelConfig: 'invalid'
+        });
+      
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Invalid modelConfig - must be an object');
+    });
+
+    it('returns 400 for invalid system prompt type', async () => {
+      const res = await request(app)
+        .post('/ai-generate')
+        .send({ 
+          text: 'Test text',
+          systemPrompt: 123
+        });
+      
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Invalid systemPrompt - must be a string');
+    });
+
+    it('returns 400 for unsupported provider', async () => {
+      const res = await request(app)
+        .post('/ai-generate')
+        .send({ 
+          text: 'Test text',
+          modelConfig: { provider: 'anthropic' }
+        });
+      
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Only OpenAI provider is currently supported');
+    });    it('handles various text content types', async () => {
+      const testCases = [
+        'Simple question: What is AI?',
+        'Multi-line\ncontent\nwith breaks',
+        'Special chars: @#$%^&*()',
+        'Unicode: émojis 🤖, accënts',
+        'JSON: {"key": "value", "number": 42}',
+        'Code: function test() { return "hello"; }',
+        'Very long content that exceeds normal prompt length. '.repeat(50)
+      ];
+
+      for (const testText of testCases) {
+        const res = await request(app)
+          .post('/ai-generate')
+          .send({ text: testText });
+          expect(res.status).toBe(200);
+        expect(res.body.text).toBe(testText.trim());
+        expect(res.body.result).toBeDefined();
+        expect(typeof res.body.result).toBe('string');
+      }
+    }, 30000); // Increase timeout to 30 seconds
+
+    it('trims whitespace from input text', async () => {      const res = await request(app)
+        .post('/ai-generate')
+        .send({ text: '  \n  What is machine learning?  \t  ' });
+      
+      expect(res.status).toBe(200);
+      expect(res.body.text).toBe('What is machine learning?');
+    }, 10000); // Increase timeout to 10 seconds
+
+    it('includes latency measurement', async () => {
+      const res = await request(app)
+        .post('/ai-generate')
+        .send({ text: 'Quick test.' });
+      
+      expect(res.status).toBe(200);
+      expect(typeof res.body.latencyMs).toBe('number');
+      expect(res.body.latencyMs).toBeGreaterThan(0);
+    });
+
+    it('includes timestamp in ISO format', async () => {
+      const res = await request(app)
+        .post('/ai-generate')
+        .send({ text: 'Test timestamp.' });
+      
+      expect(res.status).toBe(200);
+      expect(res.body.timestamp).toBeDefined();
+      expect(new Date(res.body.timestamp)).toBeInstanceOf(Date);
+      expect(res.body.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
+    });
+
+    it('uses default OpenAI configuration when no model config provided', async () => {
+      const res = await request(app)
+        .post('/ai-generate')
+        .send({ text: 'Test default config.' });
+      
+      expect(res.status).toBe(200);
+      expect(res.body.modelConfig.provider).toBe('openai');
+      expect(res.body.modelConfig.model).toBe(DEFAULT_OPENAI_CONFIG.model);
+      expect(res.body.modelConfig.temperature).toBe(DEFAULT_OPENAI_CONFIG.temperature);
+      expect(res.body.modelConfig.maxTokens).toBe(DEFAULT_OPENAI_CONFIG.maxTokens);
+      expect(res.body.modelConfig.customApiHost).toBe(DEFAULT_OPENAI_CONFIG.apiHost);
+      expect(res.body.modelConfig.customApiKey).toBe(DEFAULT_OPENAI_CONFIG.apiKey);
     });
   });
 });

@@ -9,6 +9,7 @@ A comprehensive Node.js + TypeScript library and API for intelligent prompt gene
 - **Template-based prompt generation** using Handlebars syntax
 - **Context variable substitution** with validation and type safety
 - **Missing field detection** and comprehensive error reporting
+- **AI content generation** from raw text using OpenAI API
 - **AI-powered prompt refinement** with multiple refinement strategies
 - **OpenAI API integration** with streaming support and custom configurations
 - **Production-ready Express API** with comprehensive error handling
@@ -102,6 +103,19 @@ console.log(promptRefinement.latencyMs); // Response time in milliseconds
 const contentRefinement = await refineContent("Our app is good and helps users", "professional");
 console.log(contentRefinement.refinedContent); // Professional business tone
 console.log(contentRefinement.refinementTool); // Tool information
+
+// Generate AI content directly
+import { generateAIContent } from "@eprompt/prompt-engine";
+
+const aiResponse = await generateAIContent("Explain quantum computing", {
+  provider: "openai",
+  model: "GPT-4o",
+  temperature: 0.7,
+  maxTokens: 1000
+});
+console.log(aiResponse.result); // AI-generated explanation
+console.log(aiResponse.tokensUsed); // Tokens consumed
+console.log(aiResponse.latencyMs); // Response time
 ```
 
 ### Running as an API Server
@@ -121,6 +135,7 @@ The API server provides the following endpoints:
 - `GET /health` - Health check endpoint
 - `GET /api-docs` - Interactive Swagger documentation
 - `POST /generate` - Generate prompts from templates
+- `POST /ai-generate` - Generate AI results from text using OpenAI API
 - `POST /refine/prompt` - Refine prompts using AI (8 specialized tools)
 - `POST /refine/content` - Refine general content using AI (8 specialized tools)
 - `GET /refine/types` - Get available refinement types for both prompts and content
@@ -142,10 +157,10 @@ Welcome endpoint that provides API information and available endpoints.
 {
   "message": "Welcome to ePrompt API - Prompt Generation & Refinement Engine",
   "version": "1.0.0",
-  "description": "A powerful API for generating and refining prompts using AI",
-  "endpoints": {
+  "description": "A powerful API for generating and refining prompts using AI",  "endpoints": {
     "health": "/health",
     "generate": "/generate",
+    "ai-generate": "/ai-generate",
     "refine": "/refine/prompt and /refine/content",
     "search": "/search",
     "docs": "/api-docs"
@@ -211,6 +226,47 @@ Generate a prompt from a template and context.
     "generatedAt": "2025-07-09T10:30:00.000Z",
     "hasRequiredFields": true
   }
+}
+```
+
+#### POST /ai-generate
+
+Generate AI results from text content using OpenAI API. This endpoint allows you to send text directly to OpenAI and get AI-generated responses.
+
+**Request:**
+
+```json
+{
+  "text": "Write a brief introduction about artificial intelligence.",
+  "modelConfig": {
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 2000,
+    "customApiHost": "https://api.openai.com/v1",
+    "customApiKey": "Bearer sk-..."
+  },
+  "systemPrompt": "You are a helpful AI assistant that provides clear and informative responses."
+}
+```
+
+**Response:**
+
+```json
+{
+  "text": "Write a brief introduction about artificial intelligence.",
+  "result": "Artificial Intelligence (AI) is a branch of computer science that focuses on creating systems capable of performing tasks that typically require human intelligence. These tasks include learning, reasoning, problem-solving, perception, and language understanding. AI has revolutionized numerous industries and continues to shape our digital future through applications like machine learning, natural language processing, and computer vision.",
+  "tokensUsed": 156,
+  "latencyMs": 1250,
+  "modelConfig": {
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 2000,
+    "customApiHost": "https://api.openai.com/v1",
+    "customApiKey": "Bearer sk-..."
+  },
+  "timestamp": "2025-07-12T10:30:00.000Z"
 }
 ```
 
@@ -468,6 +524,67 @@ All endpoints return consistent error formats:
 - `400`: Bad Request (invalid input)
 - `500`: Internal Server Error
 
+## 🌐 API Usage Examples
+
+### Generate AI Content
+
+```bash
+curl -X POST http://localhost:3000/ai-generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Explain quantum computing in simple terms",
+    "modelConfig": {
+      "provider": "openai",
+      "model": "GPT-4o",
+      "temperature": 0.7,
+      "maxTokens": 1000
+    },
+    "systemPrompt": "You are a helpful educational assistant."
+  }'
+```
+
+### Generate from Template
+
+```bash
+curl -X POST http://localhost:3000/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "template": {
+      "id": "code-review",
+      "name": "Code Review",
+      "template": "Review this {{language}} code: {{code}}",
+      "role": "Code Reviewer",
+      "useCase": "Code Review"
+    },
+    "context": {
+      "language": "JavaScript",
+      "code": "function add(a, b) { return a + b; }"
+    }
+  }'
+```
+
+### Refine a Prompt
+
+```bash
+curl -X POST http://localhost:3000/refine/prompt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Write code documentation",
+    "refinementType": "specific"
+  }'
+```
+
+### Refine Content
+
+```bash
+curl -X POST http://localhost:3000/refine/content \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "Our app is good",
+    "refinementType": "professional"
+  }'
+```
+
 ## 🔧 Advanced Usage
 
 ### AI-Powered Prompt Generation
@@ -645,6 +762,8 @@ src/engine/__tests__/
 ├── refinerTools.unit.test.ts   # Refinement tool definitions
 ├── search.unit.test.ts         # Semantic search tests
 ├── openai.unit.test.ts         # OpenAI client functionality
+├── ai-generate.unit.test.ts    # AI content generation (unit tests)
+├── ai-generate.e2e.test.ts     # AI content generation (E2E tests)
 ├── openai.integration.test.ts  # OpenAI integration tests
 ├── integration.api.test.ts     # API endpoint integration
 ├── e2e.userFlow.test.ts        # Complete user workflows

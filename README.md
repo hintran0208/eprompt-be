@@ -18,7 +18,8 @@ eprompt-be/
 │   │   ├── routes/         # Express API routes
 │   │   │   ├── generate.ts     # POST /generate endpoint
 │   │   │   ├── refine.ts       # POST /refine/prompt and /refine/content endpoints
-│   │   │   └── search.ts       # POST /search endpoint
+│   │   │   ├── search.ts       # POST /search endpoint
+│   │   │   └── ai-generate.ts  # POST /ai-generate endpoint
 │   │   └── server.ts       # Express server setup
 │   ├── package.json        # Dependencies and scripts
 │   ├── tsconfig.json       # TypeScript configuration
@@ -242,6 +243,79 @@ Gets all available refinement types and tools for both prompts and content.
 }
 ```
 
+#### POST /ai-generate
+Generates AI responses from text content using OpenAI API. Accepts raw text or refined prompts and returns AI-generated content.
+
+**Request Body:**
+```json
+{
+  "text": "Explain quantum computing in simple terms",
+  "modelConfig": {
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 1000
+  },
+  "systemPrompt": "You are a helpful educational assistant. Explain concepts clearly and provide examples."
+}
+```
+
+**Response:**
+```json
+{
+  "response": "Quantum computing is a revolutionary approach to processing information that harnesses the strange properties of quantum mechanics...",
+  "originalText": "Explain quantum computing in simple terms",
+  "modelConfig": {
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 1000
+  },
+  "systemPrompt": "You are a helpful educational assistant. Explain concepts clearly and provide examples.",
+  "tokensUsed": 245,
+  "latencyMs": 1850,
+  "timestamp": "2025-07-09T10:30:00.000Z"
+}
+```
+
+**Error Responses:**
+- `400`: Missing or invalid text, invalid modelConfig, unsupported provider
+- `500`: OpenAI API error, internal server error
+
+#### POST /search
+Performs semantic search for prompts and content using advanced search algorithms.
+
+**Request Body:**
+```json
+{
+  "query": {
+    "text": "Prompt for text summarization"
+  },
+  "options": {
+    "topK": 5
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "results": [
+    {
+      "id": "summary-1",
+      "content": "Summarize the following text...",
+      "score": 0.95,
+      "metadata": {
+        "type": "prompt",
+        "category": "summarization"
+      }
+    }
+  ],
+  "totalResults": 1,
+  "query": "text summarization"
+}
+```
+
 ## 🔧 Usage Examples
 
 ### Basic Prompt Generation
@@ -298,6 +372,22 @@ curl -X POST http://localhost:3000/refine/content \
   }'
 ```
 
+### AI Content Generation
+```bash
+curl -X POST http://localhost:3000/ai-generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Explain quantum computing in simple terms",
+    "modelConfig": {
+      "provider": "openai",
+      "model": "GPT-4o",
+      "temperature": 0.7,
+      "maxTokens": 1000
+    },
+    "systemPrompt": "You are a helpful educational assistant. Explain concepts clearly and provide examples."
+  }'
+```
+
 ### Prompt Search
 ```bash
 curl -X POST http://localhost:3000/search \
@@ -341,6 +431,16 @@ console.log(result.prompt); // "Hello Alice! Welcome to ePrompt."
 const refined = await refinePrompt('Write something about AI', 'specific');
 console.log(refined.refinedPrompt); // Much more detailed and specific prompt
 console.log(refined.tokensUsed); // Number of tokens used by AI
+
+// Generate AI content directly
+const aiResponse = await generateAIContent('Explain quantum computing', {
+  provider: 'openai',
+  model: 'GPT-4o',
+  temperature: 0.7,
+  maxTokens: 1000
+});
+console.log(aiResponse.response); // AI-generated explanation
+console.log(aiResponse.tokensUsed); // Tokens consumed
 ```
 
 ## 🧪 Testing
@@ -359,6 +459,8 @@ src/engine/__tests__/
 ├── refinerTools.unit.test.ts   # Refinement tool definitions
 ├── search.unit.test.ts         # Semantic search tests
 ├── openai.unit.test.ts         # OpenAI API client
+├── ai-generate.unit.test.ts    # AI content generation (unit tests)
+├── ai-generate.e2e.test.ts     # AI content generation (E2E tests)
 ├── openai.integration.test.ts  # OpenAI integration tests
 ├── integration.api.test.ts     # API endpoint tests
 ├── e2e.userFlow.test.ts        # End-to-end user flows

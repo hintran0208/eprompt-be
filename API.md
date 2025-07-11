@@ -166,6 +166,137 @@ curl -X POST http://localhost:3000/generate \
 
 ---
 
+### POST /ai-generate
+
+Generate AI results from text content using OpenAI API. This endpoint provides direct access to OpenAI's completion API.
+
+#### Request Body
+
+```json
+{
+  "text": "string",
+  "modelConfig": {            // optional, uses default OpenAI config if not provided
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 2000,
+    "customApiHost": "string", // optional
+    "customApiKey": "string"   // optional
+  },
+  "systemPrompt": "string"    // optional
+}
+```
+
+#### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `text` | string | Yes | The text content to send to OpenAI API |
+| `modelConfig` | object | No | Configuration for the AI model (uses defaults if not provided) |
+| `modelConfig.provider` | string | No | AI provider, currently only "openai" is supported |
+| `modelConfig.model` | string | No | Model name (defaults to "GPT-4o") |
+| `modelConfig.temperature` | number | No | Creativity level 0-1 (defaults to 0.7) |
+| `modelConfig.maxTokens` | number | No | Maximum response tokens (defaults to 2000) |
+| `modelConfig.customApiHost` | string | No | Custom API host URL |
+| `modelConfig.customApiKey` | string | No | Custom API key |
+| `systemPrompt` | string | No | System prompt to provide context to the AI |
+
+#### Response
+
+```json
+{
+  "text": "string",
+  "result": "string", 
+  "tokensUsed": "number",
+  "latencyMs": "number",
+  "modelConfig": "object",
+  "timestamp": "string"
+}
+```
+
+#### Response Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `text` | string | The original input text (trimmed) |
+| `result` | string | AI-generated response from OpenAI |
+| `tokensUsed` | number | Number of tokens consumed in the API call |
+| `latencyMs` | number | Processing time in milliseconds |
+| `modelConfig` | object | The actual model configuration used |
+| `timestamp` | string | ISO timestamp of when the generation occurred |
+
+#### Example Request
+
+```bash
+curl -X POST http://localhost:3000/ai-generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Write a brief introduction about artificial intelligence.",
+    "modelConfig": {
+      "provider": "openai",
+      "model": "GPT-4o",
+      "temperature": 0.7,
+      "maxTokens": 2000
+    },
+    "systemPrompt": "You are a helpful AI assistant that provides clear and informative responses."
+  }'
+```
+
+#### Example Response
+
+```json
+{
+  "text": "Write a brief introduction about artificial intelligence.",
+  "result": "Artificial Intelligence (AI) is a branch of computer science that focuses on creating systems capable of performing tasks that typically require human intelligence. These tasks include learning, reasoning, problem-solving, perception, and language understanding. AI has revolutionized numerous industries and continues to shape our digital future through applications like machine learning, natural language processing, and computer vision.",
+  "tokensUsed": 156,
+  "latencyMs": 1250,
+  "modelConfig": {
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 2000,
+    "customApiHost": "https://aiportalapi.stu-platform.live/jpe/v1",
+    "customApiKey": "Bearer sk-dwFEogyru-tSQqgObMgpKw"
+  },
+  "timestamp": "2025-07-12T10:30:00.000Z"
+}
+```
+
+#### Error Examples
+
+**Missing Text:**
+```json
+{
+  "error": "Missing or invalid text - must be a non-empty string"
+}
+```
+
+**Invalid Model Config:**
+```json
+{
+  "error": "Invalid modelConfig - must be an object"
+}
+```
+
+**Unsupported Provider:**
+```json
+{
+  "error": "Only OpenAI provider is currently supported"
+}
+```
+
+**OpenAI API Error:**
+```json
+{
+  "error": "OpenAI API error",
+  "details": "OpenAI API error: 429 - Rate limit exceeded",
+  "latencyMs": 1200,
+  "timestamp": "2025-07-12T10:30:00.000Z"
+}
+```
+
+---
+
 ### POST /refine
 
 Refine and optimize a prompt using AI-powered refinement tools.
