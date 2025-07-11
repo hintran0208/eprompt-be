@@ -7,10 +7,19 @@ import refineRoute from '../../routes/refine';
 import { createTemplate } from '../generator';
 import { DEFAULT_OPENAI_CONFIG } from '../openai';
 
-// Mock the refinePrompt function to avoid actual API calls in integration tests
+// Mock the refiner module functions
 jest.mock('../refiner');
 
-const mockRefinedResult = {
+// Import the mocked module
+import { refinePrompt, getRefinementTypes, refinerTools } from '../refiner';
+
+// Setup the mocks
+const mockRefinePrompt = refinePrompt as jest.MockedFunction<typeof refinePrompt>;
+const mockGetRefinementTypes = getRefinementTypes as jest.MockedFunction<typeof getRefinementTypes>;
+const mockRefinerTools = refinerTools as any;
+
+// Configure the mocks
+mockRefinePrompt.mockResolvedValue({
   refinedPrompt: 'This is a refined and improved prompt with better clarity and structure.',
   originalPrompt: 'Write something about AI',
   refinementTool: {
@@ -23,11 +32,58 @@ const mockRefinedResult = {
   },
   tokensUsed: 75,
   latencyMs: 1200
-};
+});
 
-// Import and set up the mock after the module is mocked
-const { refinePrompt } = require('../refiner');
-(refinePrompt as any).mockResolvedValue(mockRefinedResult);
+mockGetRefinementTypes.mockReturnValue(['concise', 'specific', 'structured', 'context', 'constraints', 'roleplay']);
+
+// Mock refinerTools as a property
+Object.defineProperty(mockRefinerTools, 'length', { value: 6 });
+Object.defineProperty(mockRefinerTools, 'map', {
+  value: jest.fn().mockReturnValue([
+    {
+      id: 'concise',
+      name: 'Make Concise',
+      icon: '✂️',
+      description: 'Remove unnecessary words and make it shorter',
+      color: 'blue'
+    },
+    {
+      id: 'specific',
+      name: 'More Specific',
+      icon: '🎯',
+      description: 'Add clarity and specificity to reduce ambiguity',
+      color: 'green'
+    },
+    {
+      id: 'structured',
+      name: 'Better Structure',
+      icon: '🏗️',
+      description: 'Improve organization and readability',
+      color: 'yellow'
+    },
+    {
+      id: 'context',
+      name: 'Add Context',
+      icon: '📋',
+      description: 'Add more comprehensive context and examples',
+      color: 'orange'
+    },
+    {
+      id: 'constraints',
+      name: 'Add Constraints',
+      icon: '⚙️',
+      description: 'Add technical constraints and output format guidance',
+      color: 'gray'
+    },
+    {
+      id: 'roleplay',
+      name: 'Role-based',
+      icon: '🎭',
+      description: 'Add role-playing elements and persona guidance',
+      color: 'purple'
+    }
+  ])
+});
 
 dotenv.config({ path: '../../.env.example' });
 
