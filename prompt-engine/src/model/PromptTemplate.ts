@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 import { PromptTemplate } from '../engine/types';
 
-const promptTemplateSchema = new mongoose.Schema<PromptTemplate>({
+export const promptTemplateSchema = new mongoose.Schema<PromptTemplate>({
     id: { type: String, required: true, unique: true },
     name: { type: String, required: true },
     description: { type: String, required: true },
