@@ -51,6 +51,10 @@
     },
     "SUPABASE_KEY": {
       "description": "Supabase API key"
+    },
+    "MONGODB_URI": {
+      "description": "Uri for MongoDB connection",
+      "value": "mongodb+srv://agent:agent@eprompt.gdos1r8.mongodb.net/Eprompt?retryWrites=true&w=majority&appName=Eprompt"
     }
   },
   "addons": [
