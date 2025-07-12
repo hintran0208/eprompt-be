@@ -1,3 +1,4 @@
+import { describe, it, expect } from '@jest/globals';
 import { OpenAIClient, DEFAULT_OPENAI_CONFIG } from '../openai';
 
 describe('openai module', () => {

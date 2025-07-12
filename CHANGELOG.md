@@ -77,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   - `POST /generate` - Generate prompts from templates
   - `POST /refine` - AI-powered prompt refinement with multiple strategies
+  - `POST /search` - Find matching prompts using semantic search
   - `GET /refine/types` - Get available refinement tools and types
   - Comprehensive request validation
   - Structured error responses

@@ -11,6 +11,7 @@ eprompt-be/
 │   │   ├── engine/         # Core prompt generation logic
 │   │   │   ├── generator.ts    # Prompt generation and AI integration
 │   │   │   ├── refiner.ts      # Prompt refinement tools
+│   │   │   ├── search.ts       # Prompt semantic search tools
 │   │   │   ├── openai.ts       # OpenAI API client
 │   │   │   ├── types.ts        # TypeScript type definitions
 │   │   │   └── __tests__/      # Comprehensive test suite
@@ -18,9 +19,11 @@ eprompt-be/
 │   │   │   └── PromptTemplate.ts   # Mongoose template model
 │   │   ├── routes/         # Express API routes
 │   │   │   ├── generate.ts     # POST /generate endpoint
-│   │   │   ├── refine.ts       # POST /refine endpoint
-│   │   │   └── template.ts     # Template management endpoints
-│   │   └── server.ts       # Express server setup with MongoDB
+│   │   │   ├── refine.ts       # POST /refine/prompt and /refine/content endpoints
+│   │   │   ├── search.ts       # POST /search endpoint
+│   │   │   |── ai-generate.ts  # POST /ai-generate endpoint
+|   |   |   └── template.ts     # Template management endpoints
+│   │   └── server.ts       # Express server setup
 │   ├── package.json        # Dependencies and scripts
 │   ├── tsconfig.json       # TypeScript configuration
 │   └── jest.config.js      # Test configuration
@@ -231,9 +234,8 @@ Generates a prompt from a template and context variables.
 - `400`: Missing or invalid template/context
 - `500`: Internal server error
 
-#### POST /refine
-
-Refines a prompt using AI-powered refinement tools to improve clarity, structure, and effectiveness.
+#### POST /refine/prompt
+Refines a prompt using AI-powered prompt refinement tools to improve clarity, structure, and effectiveness.
 
 **Request Body:**
 
@@ -268,31 +270,158 @@ Refines a prompt using AI-powered refinement tools to improve clarity, structure
 }
 ```
 
-#### GET /refine/types
+#### POST /refine/content
+Refines general content using AI-powered content refinement tools to improve tone, style, and effectiveness.
 
-Gets all available refinement types and tools.
+**Request Body:**
+```json
+{
+  "content": "Our app is good and helps users",
+  "refinementType": "professional",
+  "modelConfig": {
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 2000
+  }
+}
+```
 
 **Response:**
 
 ```json
 {
-  "types": ["concise", "specific", "structured", "context", "constraints", "roleplay"],
-  "tools": [
+  "refinedContent": "Our application delivers exceptional value by providing users with intuitive, reliable solutions that streamline their workflow and enhance productivity.",
+  "originalContent": "Our app is good and helps users",
+  "refinementTool": {
+    "id": "professional",
+    "name": "Professional Tone",
+    "icon": "💼",
+    "description": "Transform content to have a professional business tone",
+    "color": "blue"
+  },
+  "tokensUsed": 89,
+  "latencyMs": 980
+}
+```
+
+#### GET /refine/types
+Gets all available refinement types and tools for both prompts and content.
+
+**Response:**
+```json
+{
+  "prompt": {
+    "types": ["specific", "concise", "structured", "context", "constraints", "roleplay", "examples", "error-handling"],
+    "tools": [
+      {
+        "id": "specific",
+        "name": "More Specific",
+        "icon": "🎯",
+        "description": "Add clarity and specificity to reduce ambiguity",
+        "color": "green"
+      },
+      {
+        "id": "concise",
+        "name": "Make Concise",
+        "icon": "✂️",
+        "description": "Remove unnecessary words and make it shorter",
+        "color": "blue"
+      }
+    ]
+  },
+  "content": {
+    "types": ["clarity", "professional", "engaging", "concise", "detailed", "technical", "creative", "persuasive"],
+    "tools": [
+      {
+        "id": "clarity",
+        "name": "Improve Clarity",
+        "icon": "💎",
+        "description": "Make content clearer and easier to understand",
+        "color": "blue"
+      },
+      {
+        "id": "professional",
+        "name": "Professional Tone",
+        "icon": "💼",
+        "description": "Transform content to have a professional business tone",
+        "color": "navy"
+      }
+    ]
+  }
+}
+```
+
+#### POST /ai-generate
+Generates AI responses from text content using OpenAI API. Accepts raw text or refined prompts and returns AI-generated content.
+
+**Request Body:**
+```json
+{
+  "text": "Explain quantum computing in simple terms",
+  "modelConfig": {
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 1000
+  },
+  "systemPrompt": "You are a helpful educational assistant. Explain concepts clearly and provide examples."
+}
+```
+
+**Response:**
+```json
+{
+  "response": "Quantum computing is a revolutionary approach to processing information that harnesses the strange properties of quantum mechanics...",
+  "originalText": "Explain quantum computing in simple terms",
+  "modelConfig": {
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 1000
+  },
+  "systemPrompt": "You are a helpful educational assistant. Explain concepts clearly and provide examples.",
+  "tokensUsed": 245,
+  "latencyMs": 1850,
+  "timestamp": "2025-07-09T10:30:00.000Z"
+}
+```
+
+**Error Responses:**
+- `400`: Missing or invalid text, invalid modelConfig, unsupported provider
+- `500`: OpenAI API error, internal server error
+
+#### POST /search
+Performs semantic search for prompts and content using advanced search algorithms.
+
+**Request Body:**
+```json
+{
+  "query": {
+    "text": "Prompt for text summarization"
+  },
+  "options": {
+    "topK": 5
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "results": [
     {
-      "id": "concise",
-      "name": "Make Concise",
-      "icon": "✂️",
-      "description": "Remove unnecessary words and make it shorter",
-      "color": "blue"
-    },
-    {
-      "id": "specific",
-      "name": "More Specific",
-      "icon": "🎯",
-      "description": "Add clarity and specificity to reduce ambiguity",
-      "color": "green"
+      "id": "summary-1",
+      "content": "Summarize the following text...",
+      "score": 0.95,
+      "metadata": {
+        "type": "prompt",
+        "category": "summarization"
+      }
     }
-  ]
+  ],
+  "totalResults": 1,
+  "query": "text summarization"
 }
 ```
 
@@ -355,7 +484,7 @@ curl -X POST http://localhost:3000/generate \
 ### Prompt Refinement
 
 ```bash
-curl -X POST http://localhost:3000/refine \
+curl -X POST http://localhost:3000/refine/prompt \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "Write something about AI",
@@ -367,6 +496,53 @@ curl -X POST http://localhost:3000/refine \
       "maxTokens": 2000
     }
   }'
+```
+
+### Content Refinement
+```bash
+curl -X POST http://localhost:3000/refine/content \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "Our app is good and helps users",
+    "refinementType": "professional",
+    "modelConfig": {
+      "provider": "openai",
+      "model": "GPT-4o",
+      "temperature": 0.7,
+      "maxTokens": 2000
+    }
+  }'
+```
+
+### AI Content Generation
+```bash
+curl -X POST http://localhost:3000/ai-generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Explain quantum computing in simple terms",
+    "modelConfig": {
+      "provider": "openai",
+      "model": "GPT-4o",
+      "temperature": 0.7,
+      "maxTokens": 1000
+    },
+    "systemPrompt": "You are a helpful educational assistant. Explain concepts clearly and provide examples."
+  }'
+```
+
+### Prompt Search
+```bash
+curl -X POST http://localhost:3000/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": {
+      "text": "Prompt for text summarization"
+    },
+    "options": {
+      "topK": 5
+    }
+  }'
+
 ```
 
 ### Get Available Refinement Types
@@ -399,6 +575,16 @@ console.log(result.prompt); // "Hello Alice! Welcome to ePrompt."
 const refined = await refinePrompt("Write something about AI", "specific");
 console.log(refined.refinedPrompt); // Much more detailed and specific prompt
 console.log(refined.tokensUsed); // Number of tokens used by AI
+
+// Generate AI content directly
+const aiResponse = await generateAIContent('Explain quantum computing', {
+  provider: 'openai',
+  model: 'GPT-4o',
+  temperature: 0.7,
+  maxTokens: 1000
+});
+console.log(aiResponse.response); // AI-generated explanation
+console.log(aiResponse.tokensUsed); // Tokens consumed
 ```
 
 ## 🧪 Testing
@@ -416,7 +602,10 @@ src/engine/__tests__/
 ├── generator.unit.test.ts      # Prompt generation logic
 ├── refiner.unit.test.ts        # AI-powered refinement (unit tests)
 ├── refinerTools.unit.test.ts   # Refinement tool definitions
+├── search.unit.test.ts         # Semantic search tests
 ├── openai.unit.test.ts         # OpenAI API client
+├── ai-generate.unit.test.ts    # AI content generation (unit tests)
+├── ai-generate.e2e.test.ts     # AI content generation (E2E tests)
 ├── openai.integration.test.ts  # OpenAI integration tests
 ├── integration.api.test.ts     # API endpoint tests
 ├── e2e.userFlow.test.ts        # End-to-end user flows

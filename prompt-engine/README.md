@@ -9,18 +9,32 @@ A comprehensive Node.js + TypeScript library and API for intelligent prompt gene
 - **Template-based prompt generation** using Handlebars syntax
 - **Context variable substitution** with validation and type safety
 - **Missing field detection** and comprehensive error reporting
+- **AI content generation** from raw text using OpenAI API
 - **AI-powered prompt refinement** with multiple refinement strategies
 - **OpenAI API integration** with streaming support and custom configurations
 - **Production-ready Express API** with comprehensive error handling
 
 ### Refinement Tools
 
-- **Concise**: Remove unnecessary words while preserving meaning
+**Prompt Refinement (8 tools):**
 - **Specific**: Add clarity and specificity to reduce ambiguity
+- **Concise**: Remove unnecessary words while preserving meaning
 - **Structured**: Improve organization with better sections and flow
 - **Context**: Add relevant background information and examples
 - **Constraints**: Add technical constraints and output specifications
 - **Roleplay**: Transform prompts with role-playing instructions
+- **Examples**: Include practical examples and demonstrations
+- **Error Handling**: Add robustness and error handling guidance
+
+**Content Refinement (8 tools):**
+- **Clarity**: Make content clearer and more understandable
+- **Professional**: Convert to professional business tone
+- **Engaging**: Make content more engaging and captivating
+- **Concise**: Reduce length while keeping key information
+- **Detailed**: Add more depth and comprehensive details
+- **Technical**: Enhance technical accuracy and terminology
+- **Creative**: Add creativity and artistic flair
+- **Persuasive**: Make content more persuasive and compelling
 
 ### Developer Experience
 
@@ -80,10 +94,28 @@ if (result.missingFields.length > 0) {
 }
 
 // Refine a prompt using AI
-const refinementResult = await refinePrompt("Write something about AI", "specific");
-console.log(refinementResult.refinedPrompt); // AI-enhanced, much more detailed prompt
-console.log(refinementResult.tokensUsed); // Tokens consumed by the AI
-console.log(refinementResult.latencyMs); // Response time in milliseconds
+const promptRefinement = await refinePrompt("Write something about AI", "specific");
+console.log(promptRefinement.refinedPrompt); // AI-enhanced, much more detailed prompt
+console.log(promptRefinement.tokensUsed); // Tokens consumed by the AI
+console.log(promptRefinement.latencyMs); // Response time in milliseconds
+
+// Refine content using AI
+const contentRefinement = await refineContent("Our app is good and helps users", "professional");
+console.log(contentRefinement.refinedContent); // Professional business tone
+console.log(contentRefinement.refinementTool); // Tool information
+
+// Generate AI content directly
+import { generateAIContent } from "@eprompt/prompt-engine";
+
+const aiResponse = await generateAIContent("Explain quantum computing", {
+  provider: "openai",
+  model: "GPT-4o",
+  temperature: 0.7,
+  maxTokens: 1000
+});
+console.log(aiResponse.result); // AI-generated explanation
+console.log(aiResponse.tokensUsed); // Tokens consumed
+console.log(aiResponse.latencyMs); // Response time
 ```
 
 ### Running as an API Server
@@ -103,8 +135,11 @@ The API server provides the following endpoints:
 - `GET /health` - Health check endpoint
 - `GET /api-docs` - Interactive Swagger documentation
 - `POST /generate` - Generate prompts from templates
-- `POST /refine` - Refine prompts using AI
-- `GET /refine/types` - Get available refinement types
+- `POST /ai-generate` - Generate AI results from text using OpenAI API
+- `POST /refine/prompt` - Refine prompts using AI (8 specialized tools)
+- `POST /refine/content` - Refine general content using AI (8 specialized tools)
+- `GET /refine/types` - Get available refinement types for both prompts and content
+- `POST /search` - Find matching prompts using semantic search
 
 Visit `http://localhost:3000/api-docs` to explore the interactive API documentation.
 
@@ -122,11 +157,12 @@ Welcome endpoint that provides API information and available endpoints.
 {
   "message": "Welcome to ePrompt API - Prompt Generation & Refinement Engine",
   "version": "1.0.0",
-  "description": "A powerful API for generating and refining prompts using AI",
-  "endpoints": {
+  "description": "A powerful API for generating and refining prompts using AI",  "endpoints": {
     "health": "/health",
     "generate": "/generate",
-    "refine": "/refine",
+    "ai-generate": "/ai-generate",
+    "refine": "/refine/prompt and /refine/content",
+    "search": "/search",
     "docs": "/api-docs"
   },
   "timestamp": "2025-07-10T12:00:00.000Z"
@@ -193,9 +229,50 @@ Generate a prompt from a template and context.
 }
 ```
 
-#### POST /refine
+#### POST /ai-generate
 
-Refine and optimize a prompt using AI-powered refinement tools.
+Generate AI results from text content using OpenAI API. This endpoint allows you to send text directly to OpenAI and get AI-generated responses.
+
+**Request:**
+
+```json
+{
+  "text": "Write a brief introduction about artificial intelligence.",
+  "modelConfig": {
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 2000,
+    "customApiHost": "https://api.openai.com/v1",
+    "customApiKey": "Bearer sk-..."
+  },
+  "systemPrompt": "You are a helpful AI assistant that provides clear and informative responses."
+}
+```
+
+**Response:**
+
+```json
+{
+  "text": "Write a brief introduction about artificial intelligence.",
+  "result": "Artificial Intelligence (AI) is a branch of computer science that focuses on creating systems capable of performing tasks that typically require human intelligence. These tasks include learning, reasoning, problem-solving, perception, and language understanding. AI has revolutionized numerous industries and continues to shape our digital future through applications like machine learning, natural language processing, and computer vision.",
+  "tokensUsed": 156,
+  "latencyMs": 1250,
+  "modelConfig": {
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 2000,
+    "customApiHost": "https://api.openai.com/v1",
+    "customApiKey": "Bearer sk-..."
+  },
+  "timestamp": "2025-07-12T10:30:00.000Z"
+}
+```
+
+#### POST /refine/prompt
+
+Refine and optimize a prompt using AI-powered prompt refinement tools.
 
 **Request:**
 
@@ -230,60 +307,203 @@ Refine and optimize a prompt using AI-powered refinement tools.
 }
 ```
 
-#### GET /refine/types
+#### POST /refine/content
 
-Get all available refinement types and tools.
+Refine and optimize general content using AI-powered content refinement tools.
+
+**Request:**
+
+```json
+{
+  "content": "Our app is good and helps users",
+  "refinementType": "professional",
+  "modelConfig": {
+    "provider": "openai",
+    "model": "GPT-4o",
+    "temperature": 0.7,
+    "maxTokens": 2000
+  }
+}
+```
 
 **Response:**
 
 ```json
 {
-  "types": ["concise", "specific", "structured", "context", "constraints", "roleplay"],
-  "tools": [
-    {
-      "id": "concise",
-      "name": "Make Concise",
-      "icon": "✂️",
-      "description": "Remove unnecessary words and make it shorter",
-      "color": "blue"
-    },
-    {
-      "id": "specific",
-      "name": "More Specific",
-      "icon": "🎯",
-      "description": "Add clarity and specificity to reduce ambiguity",
-      "color": "green"
-    },
-    {
-      "id": "structured",
-      "name": "Better Structure",
-      "icon": "🏗️",
-      "description": "Improve organization and readability",
-      "color": "indigo"
-    },
-    {
-      "id": "context",
-      "name": "Add Context",
-      "icon": "📋",
-      "description": "Add more comprehensive context and examples",
-      "color": "orange"
-    },
-    {
-      "id": "constraints",
-      "name": "Add Constraints",
-      "icon": "⚙️",
-      "description": "Add technical constraints and output format guidance",
-      "color": "gray"
-    },
-    {
-      "id": "roleplay",
-      "name": "Role-based",
-      "icon": "🎭",
-      "description": "Add role-playing elements and persona guidance",
-      "color": "purple"
-    }
-  ]
+  "refinedContent": "Our application delivers exceptional value by providing users with intuitive, reliable solutions that streamline their workflow and enhance productivity. Through carefully designed features and user-centric functionality, we enable our clients to achieve their goals more efficiently and effectively.",
+  "originalContent": "Our app is good and helps users",
+  "refinementTool": {
+    "id": "professional",
+    "name": "Professional Tone",
+    "icon": "💼",
+    "description": "Transform content to have a professional business tone",
+    "color": "blue"
+  },
+  "tokensUsed": 89,
+  "latencyMs": 980
 }
+```
+
+#### GET /refine/types
+
+Get all available refinement types and tools for both prompts and content.
+
+**Response:**
+
+```json
+{
+  "prompt": {
+    "types": ["specific", "concise", "structured", "context", "constraints", "roleplay", "examples", "error-handling"],
+    "tools": [
+      {
+        "id": "specific",
+        "name": "More Specific",
+        "icon": "🎯",
+        "description": "Add clarity and specificity to reduce ambiguity",
+        "color": "green"
+      },
+      {
+        "id": "concise",
+        "name": "Make Concise",
+        "icon": "✂️",
+        "description": "Remove unnecessary words and make it shorter",
+        "color": "blue"
+      },
+      {
+        "id": "structured",
+        "name": "Better Structure",
+        "icon": "🏗️",
+        "description": "Improve organization and readability",
+        "color": "yellow"
+      },
+      {
+        "id": "context",
+        "name": "Add Context",
+        "icon": "📋",
+        "description": "Add more comprehensive context and examples",
+        "color": "orange"
+      },
+      {
+        "id": "constraints",
+        "name": "Add Constraints",
+        "icon": "⚙️",
+        "description": "Add technical constraints and output format guidance",
+        "color": "gray"
+      },
+      {
+        "id": "roleplay",
+        "name": "Role-based",
+        "icon": "🎭",
+        "description": "Add role-playing elements and persona guidance",
+        "color": "purple"
+      },
+      {
+        "id": "examples",
+        "name": "Add Examples",
+        "icon": "💡",
+        "description": "Include practical examples and demonstrations",
+        "color": "cyan"
+      },
+      {
+        "id": "error-handling",
+        "name": "Error Handling",
+        "icon": "🛡️",
+        "description": "Add robustness and error handling guidance",
+        "color": "red"
+      }
+    ]
+  },
+  "content": {
+    "types": ["clarity", "professional", "engaging", "concise", "detailed", "technical", "creative", "persuasive"],
+    "tools": [
+      {
+        "id": "clarity",
+        "name": "Improve Clarity",
+        "icon": "💎",
+        "description": "Make content clearer and easier to understand",
+        "color": "blue"
+      },
+      {
+        "id": "professional",
+        "name": "Professional Tone",
+        "icon": "💼",
+        "description": "Transform content to have a professional business tone",
+        "color": "navy"
+      },
+      {
+        "id": "engaging",
+        "name": "More Engaging",
+        "icon": "✨",
+        "description": "Make content more interesting and captivating",
+        "color": "purple"
+      },
+      {
+        "id": "concise",
+        "name": "Make Concise",
+        "icon": "✂️",
+        "description": "Reduce length while maintaining key messages",
+        "color": "green"
+      },
+      {
+        "id": "detailed",
+        "name": "Add Detail",
+        "icon": "🔍",
+        "description": "Expand content with more comprehensive information",
+        "color": "orange"
+      },
+      {
+        "id": "technical",
+        "name": "Technical Precision",
+        "icon": "⚙️",
+        "description": "Add technical accuracy and specialized terminology",
+        "color": "gray"
+      },
+      {
+        "id": "creative",
+        "name": "Creative Enhancement",
+        "icon": "🎨",
+        "description": "Add creativity and innovative expression",
+        "color": "pink"
+      },
+      {
+        "id": "persuasive",
+        "name": "Persuasive Impact",
+        "icon": "🎯",
+        "description": "Make content more convincing and influential",
+        "color": "red"
+      }
+    ]
+  }
+}
+```
+
+#### POST /search
+
+Semantic search from a database using a natural language query.
+
+**Request:**
+
+```json
+{
+  "query": {
+    "text": "Prompt for text summarization"
+  },
+  "options": {
+    "topK": 5
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "results": [
+    {
+      "text": "This is the result",
+      "score": 0.69
+    },
+  ],
 }
 ```
 
@@ -303,6 +523,67 @@ All endpoints return consistent error formats:
 - `200`: Success
 - `400`: Bad Request (invalid input)
 - `500`: Internal Server Error
+
+## 🌐 API Usage Examples
+
+### Generate AI Content
+
+```bash
+curl -X POST http://localhost:3000/ai-generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Explain quantum computing in simple terms",
+    "modelConfig": {
+      "provider": "openai",
+      "model": "GPT-4o",
+      "temperature": 0.7,
+      "maxTokens": 1000
+    },
+    "systemPrompt": "You are a helpful educational assistant."
+  }'
+```
+
+### Generate from Template
+
+```bash
+curl -X POST http://localhost:3000/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "template": {
+      "id": "code-review",
+      "name": "Code Review",
+      "template": "Review this {{language}} code: {{code}}",
+      "role": "Code Reviewer",
+      "useCase": "Code Review"
+    },
+    "context": {
+      "language": "JavaScript",
+      "code": "function add(a, b) { return a + b; }"
+    }
+  }'
+```
+
+### Refine a Prompt
+
+```bash
+curl -X POST http://localhost:3000/refine/prompt \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Write code documentation",
+    "refinementType": "specific"
+  }'
+```
+
+### Refine Content
+
+```bash
+curl -X POST http://localhost:3000/refine/content \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "Our app is good",
+    "refinementType": "professional"
+  }'
+```
 
 ## 🔧 Advanced Usage
 
@@ -347,17 +628,42 @@ console.log("Latency:", result.latencyMs, "ms");
 ### Using Refinement Tools
 
 ```typescript
-import { refinerTools } from "@eprompt/prompt-engine";
+import { 
+  promptRefinerTools, 
+  contentRefinerTools,
+  refinePrompt,
+  refineContent
+} from "@eprompt/prompt-engine";
 
-// Get all available refinement tools
+// Get all available prompt refinement tools
 console.log(
-  "Available tools:",
-  refinerTools.map((t) => t.name)
+  "Available prompt tools:",
+  promptRefinerTools.map((t) => `${t.name} (${t.id})`)
 );
 
-// Use a specific refinement tool
-const specificTool = refinerTools.find((t) => t.id === "specific");
-const originalPrompt = "Write something about AI";
+// Get all available content refinement tools
+console.log(
+  "Available content tools:",
+  contentRefinerTools.map((t) => `${t.name} (${t.id})`)
+);
+
+// Refine a prompt for better structure
+const promptResult = await refinePrompt(
+  "Create a function that processes data",
+  "structured"
+);
+console.log("Refined prompt:", promptResult.refinedPrompt);
+
+// Refine content for professional tone
+const contentResult = await refineContent(
+  "Hey! Our app is super cool and does amazing stuff",
+  "professional"
+);
+console.log("Professional content:", contentResult.refinedContent);
+
+// Use a specific refinement tool manually
+const specificTool = promptRefinerTools.find((t) => t.id === "examples");
+const originalPrompt = "Write unit tests";
 const metaPrompt = `${specificTool.prompt}\n\nOriginal Prompt: "${originalPrompt}"`;
 
 // Use with AI to get refined prompt
@@ -373,6 +679,36 @@ const refinedResult = await generateAndRunPrompt(
   {},
   modelConfig
 );
+```
+
+### Content Refinement Examples
+
+```typescript
+import { refineContent, getContentRefinementTypes } from "@eprompt/prompt-engine";
+
+// Get all available content refinement types
+const contentTypes = getContentRefinementTypes();
+console.log("Content refinement types:", contentTypes);
+
+// Example: Make technical content more engaging
+const technicalContent = "Machine learning algorithms analyze data patterns to make predictions";
+const engagingResult = await refineContent(technicalContent, "engaging");
+console.log("Engaging version:", engagingResult.refinedContent);
+
+// Example: Convert casual content to professional
+const casualContent = "Our startup is doing pretty well and growing fast";
+const professionalResult = await refineContent(casualContent, "professional");
+console.log("Professional version:", professionalResult.refinedContent);
+
+// Example: Add detail to brief content
+const briefContent = "AI helps businesses";
+const detailedResult = await refineContent(briefContent, "detailed");
+console.log("Detailed version:", detailedResult.refinedContent);
+
+// Example: Make content more persuasive
+const plainContent = "Consider using our software solution";
+const persuasiveResult = await refineContent(plainContent, "persuasive");
+console.log("Persuasive version:", persuasiveResult.refinedContent);
 ```
 
 ### Custom Template Creation
@@ -424,7 +760,10 @@ src/engine/__tests__/
 ├── generator.unit.test.ts      # Core generation logic
 ├── refiner.unit.test.ts        # AI-powered refinement (unit tests)
 ├── refinerTools.unit.test.ts   # Refinement tool definitions
+├── search.unit.test.ts         # Semantic search tests
 ├── openai.unit.test.ts         # OpenAI client functionality
+├── ai-generate.unit.test.ts    # AI content generation (unit tests)
+├── ai-generate.e2e.test.ts     # AI content generation (E2E tests)
 ├── openai.integration.test.ts  # OpenAI integration tests
 ├── integration.api.test.ts     # API endpoint integration
 ├── e2e.userFlow.test.ts        # Complete user workflows

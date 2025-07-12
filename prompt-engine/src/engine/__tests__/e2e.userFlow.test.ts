@@ -1,3 +1,4 @@
+import { describe, it, expect } from '@jest/globals';
 import { generatePrompt, generateAndRunPrompt, createTemplate } from '../generator';
 import { refinerTools } from '../refiner';
 import { DEFAULT_OPENAI_CONFIG } from '../openai';

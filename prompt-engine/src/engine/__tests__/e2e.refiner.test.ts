@@ -1,3 +1,4 @@
+import { describe, it, expect } from '@jest/globals';
 import { refinePrompt, getRefinementTypes, refinerTools } from '../refiner';
 import { DEFAULT_OPENAI_CONFIG } from '../openai';
 
@@ -96,8 +97,7 @@ describe('e2e: Refiner with OpenAI', () => {
     
     console.log('\n--- AVAILABLE REFINEMENT TYPES ---');
     console.log('Types:', types);
-    
-    const expectedTypes = ['concise', 'specific', 'structured', 'context', 'constraints', 'roleplay'];
+      const expectedTypes = ['specific', 'concise', 'structured', 'context', 'constraints', 'roleplay', 'examples', 'error-handling'];
     expectedTypes.forEach(type => {
       const tool = refinerTools.find(t => t.id === type);
       console.log(`${type}: ${tool?.name} ${tool?.icon} - ${tool?.description}`);
@@ -105,7 +105,7 @@ describe('e2e: Refiner with OpenAI', () => {
     console.log('--- END TYPES ---\n');
 
     expect(Array.isArray(types)).toBe(true);
-    expect(types.length).toBe(6);
+    expect(types.length).toBe(8);
     expectedTypes.forEach(type => {
       expect(types).toContain(type);
     });
@@ -115,7 +115,7 @@ describe('e2e: Refiner with OpenAI', () => {
     const originalPrompt = 'Test prompt';
     
     await expect(refinePrompt(originalPrompt, 'unknown-type')).rejects.toThrow(
-      'Unknown refinement type: unknown-type. Available types: concise, specific, structured, context, constraints, roleplay'
+      'Unknown prompt refinement type: unknown-type. Available types: specific, concise, structured, context, constraints, roleplay, examples, error-handling'
     );
   });
 });

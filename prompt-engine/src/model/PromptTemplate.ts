@@ -16,6 +16,6 @@ const promptTemplateSchema = new mongoose.Schema<PromptTemplate>({
     updatedAt: { type: Date, default: Date.now },
 });
 
-const PromptTemplateModel = mongoose.model<PromptTemplate>('PromptTemplate', promptTemplateSchema, 'prompt_templates');
+const PublicPromptTemplateModel = mongoose.model<PromptTemplate>('PromptTemplate', promptTemplateSchema, 'public_prompt_templates');
 
-export default PromptTemplateModel;
+export default PublicPromptTemplateModel;
