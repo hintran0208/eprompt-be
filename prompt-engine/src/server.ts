@@ -15,7 +15,7 @@ const app = express();
 const corsOptions = {
   origin:
     process.env.NODE_ENV === "production"
-      ? ["https://api.eprompt.me", "https://eprompt.me"] // Add production domains
+      ? ["https://api.eprompt.me", "https://eprompt.me", "https://eprompt-9vq7qe6gg-hintran0208s-projects.vercel.app"] // Add production domains
       : true, // Allow all origins in development
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "Accept"],
