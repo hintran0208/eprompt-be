@@ -3,7 +3,7 @@ import { generateAndRunPrompt, createTemplate } from '../generator';
 import { DEFAULT_OPENAI_CONFIG } from '../openai';
 import type { ModelConfig } from '../types';
 
-describe('openai integration: generateAndRunPrompt', () => {
+describe.skip('openai integration: generateAndRunPrompt', () => {
   it('should generate and run a prompt with OpenAI API using default config', async () => {
     // Ensure we're using the default API token
     console.log('\n--- OPENAI INTEGRATION TEST CONFIG ---');

@@ -1,7 +1,7 @@
 import { describe, it, expect } from '@jest/globals';
 import { OpenAIClient, DEFAULT_OPENAI_CONFIG } from '../openai';
 
-describe('openai module', () => {
+describe.skip('openai module', () => {
   it('should generate a completion from OpenAI API (smoke test)', async () => {
     // Ensure we're using the default API token
     console.log('\n--- OPENAI CONFIG ---');

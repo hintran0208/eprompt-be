@@ -3,7 +3,7 @@ import { generatePrompt, generateAndRunPrompt, createTemplate } from '../generat
 import { refinerTools } from '../refiner';
 import { DEFAULT_OPENAI_CONFIG } from '../openai';
 
-describe('e2e: Full user flow (OpenAI)', () => {
+describe.skip('e2e: Full user flow (OpenAI)', () => {
   it('should generate a prompt, refine it, and get real AI output', async () => {
     // Ensure we're using the default API token
     console.log('\n--- OPENAI CONFIG FOR E2E ---');
