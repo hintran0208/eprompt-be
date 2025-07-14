@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 app.use('/ai-generate', aiGenerateRoute);
 
-describe('e2e: POST /ai-generate (Real OpenAI Integration)', () => {
+describe.skip('e2e: POST /ai-generate (Real OpenAI Integration)', () => {
   it('should generate real AI response from OpenAI API', async () => {
     console.log('\n--- AI-GENERATE E2E TEST CONFIG ---');
     console.log('API Host:', DEFAULT_OPENAI_CONFIG.apiHost);
