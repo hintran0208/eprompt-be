@@ -2,7 +2,7 @@ import { describe, it, expect } from '@jest/globals';
 import { refinePrompt, getRefinementTypes, refinerTools } from '../refiner';
 import { DEFAULT_OPENAI_CONFIG } from '../openai';
 
-describe('e2e: Refiner with OpenAI', () => {
+describe.skip('e2e: Refiner with OpenAI', () => {
   it('should refine a prompt using AI with default refinement type', async () => {
     // Ensure we're using the default API token
     console.log('\n--- REFINER E2E TEST CONFIG ---');

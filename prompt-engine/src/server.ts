@@ -1,5 +1,5 @@
 import express from "express";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 
@@ -11,11 +11,23 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = ["https://api.eprompt.me", "https://eprompt.me"];
 // CORS configuration
-const corsOptions = {
+const corsOptions: CorsOptions = {
   origin:
     process.env.NODE_ENV === "production"
-      ? ["https://api.eprompt.me", "https://eprompt.me"] // Add production domains
+      ? (origin = '', callback) => {
+          // Allow production domain
+          if (allowedOrigins.includes(origin)) return callback(null, true);
+
+          // Allow all Vercel preview URLs
+          if (/^https:\/\/eprompt-.*-hintran0208s-projects\.vercel\.app$/.test(origin)) {
+            return callback(null, true);
+          }
+
+          // Otherwise, block
+          return callback(new Error('Not allowed by CORS'));
+      }
       : true, // Allow all origins in development
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "Accept"],

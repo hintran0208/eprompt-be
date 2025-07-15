@@ -193,7 +193,7 @@ export class OpenAIClient {
 
 export const DEFAULT_OPENAI_CONFIG: OpenAIConfig = {
   apiHost: 'https://aiportalapi.stu-platform.live/jpe/v1',
-  apiKey: 'Bearer sk-dwFEogyru-tSQqgObMgpKw',
+  apiKey: 'Bearer sk-liIgV8kMgKiZATKT3-QREA',
   model: 'GPT-4o',
   temperature: 0.7,
   maxTokens: 2000
