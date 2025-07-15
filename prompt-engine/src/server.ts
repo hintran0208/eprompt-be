@@ -15,6 +15,8 @@ const allowedOrigins = [
   "https://api.eprompt.me",
   "https://eprompt.me",
   "https://eprompt-be-4e52843fa931.herokuapp.com",
+  "https://www.api.eprompt.me",
+  "https://www.eprompt.me",
 ];
 
 // CORS configuration
