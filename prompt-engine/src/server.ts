@@ -11,13 +11,21 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = ["https://api.eprompt.me", "https://eprompt.me"];
+const allowedOrigins = [
+  "https://api.eprompt.me",
+  "https://eprompt.me",
+  "https://eprompt-be-4e52843fa931.herokuapp.com",
+];
+
 // CORS configuration
 const corsOptions: CorsOptions = {
   origin:
     process.env.NODE_ENV === "production"
-      ? (origin = '', callback) => {
-          // Allow production domain
+      ? (origin, callback) => {
+          // Allow requests with no origin (mobile apps, curl, etc.)
+          if (!origin) return callback(null, true);
+
+          // Allow production domains
           if (allowedOrigins.includes(origin)) return callback(null, true);
 
           // Allow all Vercel preview URLs
@@ -25,9 +33,15 @@ const corsOptions: CorsOptions = {
             return callback(null, true);
           }
 
+          // Allow Heroku app URLs
+          if (/^https:\/\/eprompt-be-.*\.herokuapp\.com$/.test(origin)) {
+            return callback(null, true);
+          }
+
           // Otherwise, block
-          return callback(new Error('Not allowed by CORS'));
-      }
+          console.log(`CORS blocked origin: ${origin}`);
+          return callback(new Error("Not allowed by CORS"));
+        }
       : true, // Allow all origins in development
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "Accept"],
@@ -68,7 +82,8 @@ app.get("/", (req, res) => {
   res.status(200).json({
     message: "Welcome to ePrompt API - Prompt Generation & Refinement Engine",
     version: "1.0.0",
-    description: "A powerful API for generating and refining prompts using AI",    endpoints: {
+    description: "A powerful API for generating and refining prompts using AI",
+    endpoints: {
       health: "/health",
       generate: "/generate",
       "ai-generate": "/ai-generate",
