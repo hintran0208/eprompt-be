@@ -14,7 +14,7 @@ export type PromptTemplate = {
   description: string;
   template: string;
   role: string;
-  useCase: string;
+  tags: string[];
   requiredFields: string[];
   optionalFields?: string[];
   metadata?: Record<string, any>;
@@ -74,7 +74,7 @@ export type UIState = {
 
 export type TemplateFilter = {
   role?: string;
-  useCase?: string;
+  tags?: string[];
   search?: string;
 };
 

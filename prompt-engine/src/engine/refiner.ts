@@ -48,7 +48,7 @@ CRITICAL INSTRUCTIONS:
     description: `Refine prompt using ${tool.name}`,
     template: metaPrompt,
     role: 'Prompt Engineer',
-    useCase: 'Prompt Refinement'
+    tags: ['Prompt Refinement']
   });
 
   const result = await generateAndRunPrompt(template, {}, config);
@@ -108,7 +108,7 @@ CRITICAL INSTRUCTIONS:
     description: `Refine content using ${tool.name}`,
     template: metaPrompt,
     role: 'Content Editor',
-    useCase: 'Content Refinement'
+    tags: ['Content Refinement']
   });
 
   const result = await generateAndRunPrompt(template, {}, config);

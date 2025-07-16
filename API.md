@@ -36,6 +36,157 @@ All endpoints return consistent error responses:
 
 ## Endpoints
 
+### General
+
+#### GET /
+
+Welcome endpoint that provides API information and available endpoints.
+
+##### Response
+
+```json
+{
+  "message": "Welcome to ePrompt API - Prompt Generation & Refinement Engine",
+  "version": "1.0.0",
+  "description": "A powerful API for generating and refining prompts using AI",
+  "endpoints": {
+    "health": "/health",
+    "generate": "/generate",
+    "refine": "/refine",
+    "docs": "/api-docs"
+  },
+  "timestamp": "2025-07-12T10:30:00.000Z"
+}
+```
+
+#### GET /health
+
+Health check endpoint to verify API status.
+
+##### Response
+
+```json
+{
+  "status": "OK",
+  "timestamp": "2025-07-12T10:30:00.000Z"
+}
+```
+
+### Template Management
+
+#### GET /template/all
+
+Get all available prompt templates from the database.
+
+##### Response
+
+```json
+[
+  {
+    "id": "greeting",
+    "name": "User Greeting",
+    "description": "Generate personalized user greetings",
+    "template": "Hello {{name}}! Welcome to {{platform}}. As a {{role}}, you can {{action}}.",
+    "role": "Assistant",
+    "useCase": "User Onboarding",
+    "requiredFields": ["name", "platform"],
+    "optionalFields": ["role", "action"],
+    "metadata": {},
+    "createdAt": "2025-07-09T10:30:00.000Z",
+    "updatedAt": "2025-07-09T10:30:00.000Z"
+  }
+]
+```
+
+#### GET /template/:id
+
+Get a specific prompt template by its ID.
+
+##### Parameters
+
+| Parameter | Type   | Required | Description                       |
+| --------- | ------ | -------- | --------------------------------- |
+| `id`      | string | Yes      | Unique identifier of the template |
+
+##### Response
+
+```json
+{
+  "id": "greeting",
+  "name": "User Greeting",
+  "description": "Generate personalized user greetings",
+  "template": "Hello {{name}}! Welcome to {{platform}}. As a {{role}}, you can {{action}}.",
+  "role": "Assistant",
+  "useCase": "User Onboarding",
+  "requiredFields": ["name", "platform"],
+  "optionalFields": ["role", "action"],
+  "metadata": {},
+  "createdAt": "2025-07-09T10:30:00.000Z",
+  "updatedAt": "2025-07-09T10:30:00.000Z"
+}
+```
+
+##### Error Responses
+
+- `404`: Template not found
+- `500`: Internal server error
+
+#### POST /template/add
+
+Add a new prompt template to the database.
+
+##### Request Body
+
+```json
+{
+  "id": "unique-template-id",
+  "name": "Template Name",
+  "description": "Description of what this template does",
+  "template": "Template string with {{variables}}",
+  "role": "Assistant",
+  "useCase": "General",
+  "requiredFields": ["variable1", "variable2"],
+  "optionalFields": ["optionalVar"],
+  "metadata": {}
+}
+```
+
+##### Request Properties
+
+| Property         | Type     | Required | Description                          |
+| ---------------- | -------- | -------- | ------------------------------------ |
+| `id`             | string   | Yes      | Unique identifier for the template   |
+| `name`           | string   | Yes      | Human-readable name                  |
+| `description`    | string   | Yes      | Description of template purpose      |
+| `template`       | string   | Yes      | Template string with {{variables}}   |
+| `role`           | string   | Yes      | Role context for the template        |
+| `useCase`        | string   | Yes      | Use case description                 |
+| `requiredFields` | string[] | Yes      | List of required context variables   |
+| `optionalFields` | string[] | No       | List of optional context variables   |
+| `metadata`       | object   | No       | Additional metadata for the template |
+
+##### Response
+
+```json
+{
+  "id": "unique-template-id",
+  "name": "Template Name",
+  "description": "Description of what this template does",
+  "template": "Template string with {{variables}}",
+  "role": "Assistant",
+  "useCase": "General",
+  "requiredFields": ["variable1", "variable2"],
+  "optionalFields": ["optionalVar"],
+  "metadata": {},
+  "createdAt": "2025-07-09T10:30:00.000Z",
+  "updatedAt": "2025-07-09T10:30:00.000Z"
+}
+```
+
+##### Error Responses
+
+- `500`: Failed to add template (e.g., duplicate ID, validation error)
+
 ### POST /generate
 
 Generate a prompt from a template and context variables.
@@ -46,7 +197,7 @@ Generate a prompt from a template and context variables.
 {
   "template": {
     "id": "string",
-    "name": "string", 
+    "name": "string",
     "description": "string",
     "template": "string",
     "role": "string",
@@ -63,16 +214,16 @@ Generate a prompt from a template and context variables.
 
 #### Template Object Properties
 
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| `id` | string | Yes | Unique identifier for the template |
-| `name` | string | Yes | Human-readable name |
-| `description` | string | Yes | Description of template purpose |
-| `template` | string | Yes | Template string with {{variables}} |
-| `role` | string | Yes | Role context for the template |
-| `useCase` | string | Yes | Use case description |
-| `requiredFields` | string[] | Yes | List of required context variables |
-| `optionalFields` | string[] | No | List of optional context variables |
+| Property         | Type     | Required | Description                        |
+| ---------------- | -------- | -------- | ---------------------------------- |
+| `id`             | string   | Yes      | Unique identifier for the template |
+| `name`           | string   | Yes      | Human-readable name                |
+| `description`    | string   | Yes      | Description of template purpose    |
+| `template`       | string   | Yes      | Template string with {{variables}} |
+| `role`           | string   | Yes      | Role context for the template      |
+| `useCase`        | string   | Yes      | Use case description               |
+| `requiredFields` | string[] | Yes      | List of required context variables |
+| `optionalFields` | string[] | No       | List of optional context variables |
 
 #### Context Object
 
@@ -87,7 +238,7 @@ The context object should contain key-value pairs where keys match the variables
   "contextUsed": ["string"],
   "metadata": {
     "templateId": "string",
-    "templateName": "string", 
+    "templateName": "string",
     "generatedAt": "string",
     "hasRequiredFields": boolean,
     "error": "string" // only present if error occurred
@@ -97,15 +248,15 @@ The context object should contain key-value pairs where keys match the variables
 
 #### Response Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `prompt` | string | Generated prompt with variables substituted |
-| `missingFields` | string[] | List of required fields missing from context |
-| `contextUsed` | string[] | List of context variables actually used |
-| `metadata.templateId` | string | ID of the template used |
-| `metadata.templateName` | string | Name of the template used |
-| `metadata.generatedAt` | string | ISO timestamp of generation |
-| `metadata.hasRequiredFields` | boolean | Whether all required fields were provided |
+| Property                     | Type     | Description                                  |
+| ---------------------------- | -------- | -------------------------------------------- |
+| `prompt`                     | string   | Generated prompt with variables substituted  |
+| `missingFields`              | string[] | List of required fields missing from context |
+| `contextUsed`                | string[] | List of context variables actually used      |
+| `metadata.templateId`        | string   | ID of the template used                      |
+| `metadata.templateName`      | string   | Name of the template used                    |
+| `metadata.generatedAt`       | string   | ISO timestamp of generation                  |
+| `metadata.hasRequiredFields` | boolean  | Whether all required fields were provided    |
 
 #### Example Request
 
@@ -126,7 +277,7 @@ curl -X POST http://localhost:3000/generate \
     "context": {
       "name": "Alice",
       "platform": "ePrompt",
-      "role": "developer", 
+      "role": "developer",
       "action": "access advanced AI tools"
     }
   }'
@@ -151,6 +302,7 @@ curl -X POST http://localhost:3000/generate \
 #### Error Examples
 
 **Missing Template:**
+
 ```json
 {
   "error": "Missing or invalid template"
@@ -158,6 +310,7 @@ curl -X POST http://localhost:3000/generate \
 ```
 
 **Missing Context:**
+
 ```json
 {
   "error": "Missing or invalid context"
@@ -307,24 +460,25 @@ Refine and optimize a prompt using AI-powered refinement tools.
 {
   "prompt": "string",
   "refinementType": "string", // optional, defaults to "specific"
-  "modelConfig": {            // optional, uses default OpenAI config if not provided
+  "modelConfig": {
+    // optional, uses default OpenAI config if not provided
     "provider": "openai",
     "model": "GPT-4o",
     "temperature": 0.7,
     "maxTokens": 2000,
     "customApiHost": "string", // optional
-    "customApiKey": "string"   // optional
+    "customApiKey": "string" // optional
   }
 }
 ```
 
 #### Request Properties
 
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| `prompt` | string | Yes | The prompt text to refine |
-| `refinementType` | string | No | Type of refinement ("concise", "specific", "structured", "context", "constraints", "roleplay") |
-| `modelConfig` | object | No | AI model configuration (uses default OpenAI config if not provided) |
+| Property         | Type   | Required | Description                                                                                    |
+| ---------------- | ------ | -------- | ---------------------------------------------------------------------------------------------- |
+| `prompt`         | string | Yes      | The prompt text to refine                                                                      |
+| `refinementType` | string | No       | Type of refinement ("concise", "specific", "structured", "context", "constraints", "roleplay") |
+| `modelConfig`    | object | No       | AI model configuration (uses default OpenAI config if not provided)                            |
 
 #### Response
 
@@ -346,13 +500,13 @@ Refine and optimize a prompt using AI-powered refinement tools.
 
 #### Response Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `refinedPrompt` | string | The AI-refined and optimized prompt |
-| `originalPrompt` | string | The original input prompt |
+| Property         | Type   | Description                                |
+| ---------------- | ------ | ------------------------------------------ |
+| `refinedPrompt`  | string | The AI-refined and optimized prompt        |
+| `originalPrompt` | string | The original input prompt                  |
 | `refinementTool` | object | Information about the refinement tool used |
-| `tokensUsed` | number | Number of AI tokens consumed |
-| `latencyMs` | number | Response time in milliseconds |
+| `tokensUsed`     | number | Number of AI tokens consumed               |
+| `latencyMs`      | number | Response time in milliseconds              |
 
 ---
 
@@ -368,7 +522,7 @@ Get all available refinement types and tools.
   "tools": [
     {
       "id": "string",
-      "name": "string", 
+      "name": "string",
       "icon": "string",
       "description": "string",
       "color": "string"
@@ -379,14 +533,14 @@ Get all available refinement types and tools.
 
 #### Available Refinement Tools
 
-| ID | Name | Icon | Description | Color |
-|-----|------|------|-------------|-------|
-| `concise` | Make Concise | ✂️ | Remove unnecessary words and make it shorter | blue |
-| `specific` | More Specific | 🎯 | Add clarity and specificity to reduce ambiguity | green |
-| `structured` | Better Structure | 🏗️ | Improve organization and readability | indigo |
-| `context` | Add Context | 📋 | Add more comprehensive context and examples | orange |
-| `constraints` | Add Constraints | ⚙️ | Add technical constraints and output format guidance | gray |
-| `roleplay` | Role-based | 🎭 | Add role-playing elements and persona guidance | purple |
+| ID            | Name             | Icon | Description                                          | Color  |
+| ------------- | ---------------- | ---- | ---------------------------------------------------- | ------ |
+| `concise`     | Make Concise     | ✂️   | Remove unnecessary words and make it shorter         | blue   |
+| `specific`    | More Specific    | 🎯   | Add clarity and specificity to reduce ambiguity      | green  |
+| `structured`  | Better Structure | 🏗️   | Improve organization and readability                 | indigo |
+| `context`     | Add Context      | 📋   | Add more comprehensive context and examples          | orange |
+| `constraints` | Add Constraints  | ⚙️   | Add technical constraints and output format guidance | gray   |
+| `roleplay`    | Role-based       | 🎭   | Add role-playing elements and persona guidance       | purple |
 
 #### Example Request
 
@@ -470,6 +624,7 @@ Search from database using semantic search.
 #### Error Examples
 
 **Missing Prompt:**
+
 ```json
 {
   "error": "Missing or invalid prompt"
@@ -504,7 +659,7 @@ Variables are automatically HTML-escaped for security. Original content is prese
 
 ### Code Review Template
 
-```json
+````json
 {
   "template": {
     "id": "code-review",
@@ -523,7 +678,7 @@ Variables are automatically HTML-escaped for security. Original content is prese
     "focus_areas": "error handling and edge cases"
   }
 }
-```
+````
 
 ### Blog Post Template
 
@@ -559,7 +714,7 @@ Variables are automatically HTML-escaped for security. Original content is prese
     "description": "Generate professional email content",
     "template": "Subject: {{subject}}\n\nDear {{recipient}},\n\n{{opening}}\n\n{{main_content}}\n\n{{closing}}\n\nBest regards,\n{{sender}}",
     "role": "Professional Communicator",
-    "useCase": "Email Communication", 
+    "useCase": "Email Communication",
     "requiredFields": ["subject", "recipient", "main_content", "sender"],
     "optionalFields": ["opening", "closing"]
   },
@@ -612,6 +767,7 @@ See individual endpoint documentation above for cURL examples.
 ## Support
 
 For API support:
+
 - Check the comprehensive test suite in the repository
 - Review the example scripts in `/examples`
 - Contact the development team

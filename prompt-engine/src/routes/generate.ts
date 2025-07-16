@@ -69,7 +69,7 @@ router.post("/", (req: Request, res: Response) => {
       description: template.description || "Generated template",
       template: template.template,
       role: template.role || "Assistant",
-      useCase: template.useCase || "General",
+      tags: template.tags || [],
       requiredFields: template.requiredFields || [],
       optionalFields: template.optionalFields || [],
       metadata: template.metadata || {},

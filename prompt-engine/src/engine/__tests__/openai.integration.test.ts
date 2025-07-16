@@ -20,7 +20,6 @@ describe.skip('openai integration: generateAndRunPrompt', () => {
       description: 'Generate a simple greeting',
       template: 'Write a friendly greeting for {{name}} who works as a {{job}}.',
       role: 'Assistant',
-      useCase: 'Greeting'
     });
 
     const context = {

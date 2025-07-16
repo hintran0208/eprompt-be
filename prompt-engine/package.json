@@ -1,7 +1,7 @@
 {
   "name": "@eprompt/prompt-engine",
   "version": "1.0.0",
-  "description": "Prompt generation and refinement backend for ePrompt.",
+  "description": "Prompt generation, refinement, and template management backend for ePrompt with MongoDB integration.",
   "main": "dist/engine/index.js",
   "types": "dist/engine/index.d.ts",
   "exports": {

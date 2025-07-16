@@ -103,7 +103,7 @@ export async function generateAndRunPrompt(
     let tokensUsed = 0;
     if (modelConfig.provider === 'openai') {
       const openaiClient = createOpenAIClient({ model: modelConfig.model });
-      const systemPrompt = `You are an expert ${template.role} helping with ${template.useCase}. \nProvide a comprehensive, well-structured response that directly addresses the user's request.\nFormat your response clearly with appropriate headings and bullet points where helpful.`;
+      const systemPrompt = `You are an expert ${template.role}.\nProvide a comprehensive, well-structured response that directly addresses the user's request.\nFormat your response clearly with appropriate headings and bullet points where helpful.`;
       const completion = await openaiClient.generateCompletion(promptOutput.prompt, {
         temperature: modelConfig.temperature,
         maxTokens: modelConfig.maxTokens,
@@ -173,7 +173,7 @@ export function createTemplate(config: {
   description: string;
   template: string;
   role: string;
-  useCase: string;
+  tags?: string[];
   requiredFields?: string[];
   optionalFields?: string[];
 }): PromptTemplate {
@@ -184,7 +184,7 @@ export function createTemplate(config: {
     description: config.description,
     template: config.template,
     role: config.role,
-    useCase: config.useCase,
+    tags: config.tags || [],
     requiredFields: config.requiredFields || templateVariables,
     optionalFields: config.optionalFields || [],
     metadata: {},
