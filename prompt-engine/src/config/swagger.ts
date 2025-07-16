@@ -31,7 +31,7 @@ const options = {
       schemas: {
         PromptTemplate: {
           type: "object",
-          required: ["id", "name", "description", "template", "role", "useCase", "requiredFields"],
+          required: ["id", "name", "description", "template", "role", "requiredFields"],
           properties: {
             id: {
               type: "string",
@@ -52,10 +52,6 @@ const options = {
             role: {
               type: "string",
               description: "Role or persona for the AI",
-            },
-            useCase: {
-              type: "string",
-              description: "Use case category for the template",
             },
             requiredFields: {
               type: "array",
@@ -93,7 +89,6 @@ const options = {
             description: "Template for generating blog posts",
             template: "Write a {{type}} blog post about {{topic}} targeting {{audience}}",
             role: "Content Writer",
-            useCase: "Content Creation",
             requiredFields: ["type", "topic", "audience"],
             optionalFields: ["tone", "length"],
             metadata: {
@@ -128,10 +123,6 @@ const options = {
               type: "string",
               description: "Role or persona for the AI",
             },
-            useCase: {
-              type: "string",
-              description: "Use case category for the template",
-            },
             requiredFields: {
               type: "array",
               items: {
@@ -158,7 +149,6 @@ const options = {
             description: "Template for generating professional emails",
             template: "Write a {{tone}} email to {{recipient}} about {{subject}}",
             role: "Professional Communicator",
-            useCase: "Business Communication",
             requiredFields: ["tone", "recipient", "subject"],
             optionalFields: ["deadline", "context"],
             metadata: {

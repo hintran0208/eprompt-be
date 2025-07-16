@@ -19,7 +19,6 @@ const greetingTemplate = createTemplate({
   description: 'Generate personalized greetings',
   template: 'Hello {{name}}! Welcome to {{platform}}. As a {{role}}, you have access to {{features}}.',
   role: 'Assistant',
-  useCase: 'User Onboarding'
 });
 
 const greetingContext = {
@@ -57,7 +56,6 @@ Please provide feedback on:
 
 Focus on {{focus_areas}} and provide specific examples.`,
   role: 'Code Reviewer',
-  useCase: 'Code Review'
 });
 
 const codeReviewContext = {
@@ -130,7 +128,6 @@ const incompleteTemplate = createTemplate({
   description: 'Template with missing context',
   template: 'Hello {{name}}! Your {{item}} is ready. Please {{action}} by {{deadline}}.',
   role: 'System',
-  useCase: 'Notifications'
 });
 
 const incompleteContext = {

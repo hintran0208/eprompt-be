@@ -21,7 +21,7 @@ describe.skip('e2e: Full user flow (OpenAI)', () => {
       description: 'Generate a checklist for reviewing a code snippet.',
       template: `As a {{role}}, review the following code:\n"""\n{{codeSnippet}}\n"""\nPlease provide feedback on:\n- Correctness\n- Readability\n- Performance\n- Edge cases\n- Suggestions for improvement`,
       role: 'Developer',
-      useCase: 'Code Review',
+      tags: [],
       requiredFields: ['role', 'codeSnippet'],
       optionalFields: []
     });
@@ -77,7 +77,7 @@ describe.skip('e2e: Full user flow (OpenAI)', () => {
         description: 'Refine a prompt',
         template: metaPrompt,
         role: 'Prompt Engineer',
-        useCase: 'Refinement'
+        tags: []
       }),
       {},
       modelConfig

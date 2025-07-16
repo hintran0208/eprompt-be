@@ -7,8 +7,7 @@ describe('generator module', () => {
     name: 'Test',
     description: 'Test',
     template: 'Hello {{name}} from {{company}}',
-    role: 'Dev',
-    useCase: 'Test'
+    role: 'Dev'
   });
 
   it('generates prompt with all fields', () => {

@@ -219,7 +219,6 @@ describe('integration: API Endpoints', () => {
         description: 'Test',
         template: 'Hello {{name}} from {{company}}',
         role: 'Dev',
-        useCase: 'Test'
       });
       const context = { name: 'Alice', company: 'Acme' };
       const res = await request(app)
