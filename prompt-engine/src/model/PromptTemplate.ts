@@ -8,7 +8,7 @@ export const promptTemplateSchema = new mongoose.Schema<PromptTemplate>({
     description: { type: String, required: true },
     template: { type: String, required: true },
     role: { type: String, required: true },
-    useCase: { type: String, required: true },
+    tags: { type: [String], required: true },
     requiredFields: { type: [String], required: true },
     optionalFields: { type: [String], default: [] },
     metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
