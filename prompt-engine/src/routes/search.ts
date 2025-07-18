@@ -113,10 +113,10 @@ router.post("/", async (req: Request, res: Response) => {
  */
 router.post('/semantic', async (req, res) => {
   try {
-    const { query } = req.body;
+    const { query, limit } = req.body;
     if (!query) return res.status(400).json({ error: 'Missing text input' });
 
-    const results = await semanticSearch(query);
+    const results = await semanticSearch(query, limit);
     res.json(results);
   } catch (error) {
     console.error('Search error:', error);
