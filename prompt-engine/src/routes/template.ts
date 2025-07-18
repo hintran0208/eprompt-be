@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 
-import PublicPromptTemplateModel from "../model/PromptTemplate";
+import { createPromptTemplate, updatePromptTemplate, updateMissingEmbeddings } from "../engine/template";
+import PublicPromptTemplateModel from "../models/PromptTemplate";
 
 const router = Router();
 
@@ -139,12 +140,81 @@ router.get("/:id", async (req: Request, res: Response) => {
 // POST /template/add - add new prompt template
 router.post("/add", async (req: Request, res: Response) => {
   try {
-    const template = new PublicPromptTemplateModel(req.body);
-    const saved = await template.save();
+    const saved = await createPromptTemplate(req.body);
     res.status(201).json(saved);
   } catch (err) {
     console.error("Error adding template:", err);
     res.status(500).json({ error: "Failed to add template" });
+  }
+});
+
+/**
+ * @swagger
+ * /template/update:
+ *   post:
+ *     summary: Update an existing prompt template (via POST)
+ *     description: Update the details of an existing prompt template by ID
+ *     tags: [Prompt Templates]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreatePromptTemplate'
+ *     responses:
+ *       200:
+ *         description: Template successfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PromptTemplate'
+ *       404:
+ *         description: Template not found
+ *       500:
+ *         description: Internal server error
+ */
+router.post("/update", async (req: Request, res: Response) => {
+  try {
+    const updated = await updatePromptTemplate(req.body);
+    if (!updated) return res.status(404).json({ error: "Template not found" });
+    res.json(updated);
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).json({ error: "Failed to update template" });
+  }
+});
+
+/**
+ * @swagger
+ * /template/update-embedding:
+ *   post:
+ *     summary: Update missing embeddings for prompt templates
+ *     description: Regenerates and updates missing or outdated vector embeddings for all prompt templates.
+ *     tags: [Prompt Templates]
+ *     responses:
+ *       200:
+ *         description: Embeddings successfully updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 total:
+ *                   type: number
+ *                 updated:
+ *                   type: number
+ *       500:
+ *         description: Failed to update embeddings due to server error
+ */
+router.post("/update-embedding", async (_req: Request, res: Response) => {
+  try {
+    const result = await updateMissingEmbeddings();
+    res.json({ message: "Updated embeddings", ...result });
+  } catch (err) {
+    console.error("Error updating embeddings:", err);
+    res.status(500).json({ error: "Failed to update embeddings" });
   }
 });
 

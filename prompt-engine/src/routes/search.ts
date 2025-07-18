@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { generateSearch } from "../engine";
+import { semanticSearch, generateSearch} from "../engine/search";
 import type { PromptContext, BaseTemplate } from "../engine/types";
 
 const router = Router();
@@ -79,6 +79,48 @@ router.post("/", async (req: Request, res: Response) => {
     res.json(output);
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : "Internal error" });
+  }
+});
+
+/**
+ * @swagger
+ * /search/semantic:
+ *   post:
+ *     summary: Perform semantic search
+ *     description: Search for prompt templates using semantic similarity.
+ *     tags: [Semantic Search]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               text:
+ *                 type: string
+ *                 description: The search query text.
+ *             required:
+ *               - text
+ *     responses:
+ *       200:
+ *         description: Search results successfully retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/PromptTemplate'
+ */
+router.post('/semantic', async (req, res) => {
+  try {
+    const { query } = req.body;
+    if (!query) return res.status(400).json({ error: 'Missing text input' });
+
+    const results = await semanticSearch(query);
+    res.json(results);
+  } catch (error) {
+    console.error('Search error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
