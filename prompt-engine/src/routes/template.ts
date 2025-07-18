@@ -187,8 +187,8 @@ router.post("/update", async (req: Request, res: Response) => {
 /**
  * @swagger
  * /template/update-embedding:
- *   post:
- *     summary: Update missing embeddings for prompt templates
+ *   get:
+ *     summary: Update missing embeddings for prompt templates - dev only
  *     description: Regenerates and updates missing or outdated vector embeddings for all prompt templates.
  *     tags: [Prompt Templates]
  *     responses:
@@ -208,7 +208,7 @@ router.post("/update", async (req: Request, res: Response) => {
  *       500:
  *         description: Failed to update embeddings due to server error
  */
-router.post("/update-embedding", async (_req: Request, res: Response) => {
+router.get("/update-embedding", async (req: Request, res: Response) => {
   try {
     const result = await updateMissingEmbeddings();
     res.json({ message: "Updated embeddings", ...result });
