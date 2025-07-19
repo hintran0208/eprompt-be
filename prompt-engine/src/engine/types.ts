@@ -18,6 +18,7 @@ export type PromptTemplate = {
   requiredFields: string[];
   optionalFields?: string[];
   metadata?: Record<string, any>;
+  embedding?: number[];
   createdAt: Date;
   updatedAt: Date;
 };

@@ -1,6 +1,7 @@
 import { describe, it, expect, jest } from '@jest/globals';
 import { refinePrompt, getRefinementTypes, refinerTools } from '../refiner';
 import { DEFAULT_OPENAI_CONFIG } from '../openai';
+import { generateAndRunPrompt } from '../generator';
 
 // Mock the generateAndRunPrompt to avoid actual API calls in unit tests
 jest.mock('../generator');
@@ -16,7 +17,6 @@ const mockGeneratedResult = {
 };
 
 // Import and set up the mock after the module is mocked
-const { generateAndRunPrompt } = require('../generator');
 (generateAndRunPrompt as any).mockResolvedValue(mockGeneratedResult);
 
 describe('refiner module', () => {

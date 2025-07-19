@@ -73,6 +73,7 @@ router.post("/", (req: Request, res: Response) => {
       requiredFields: template.requiredFields || [],
       optionalFields: template.optionalFields || [],
       metadata: template.metadata || {},
+      embedding: template.embedding || [],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
