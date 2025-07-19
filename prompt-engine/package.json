@@ -37,7 +37,6 @@
   "author": "ePrompt Team",
   "license": "MIT",
   "dependencies": {
-    "@huggingface/transformers": "^3.6.3",
     "@types/cors": "^2.8.19",
     "@types/express": "^4.17.21",
     "@types/handlebars": "^4.0.40",
