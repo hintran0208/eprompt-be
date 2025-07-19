@@ -67,7 +67,21 @@ export const updateEmbeddings = async () => {
   }
 
   return {
-    updatedCount: updatedTemplates.length,
+    total: templates.length,
+    updated: updatedTemplates.length,
     updatedIds: updatedTemplates,
   };
 };
+
+export async function getAllPromptTemplates() {
+  return await PublicPromptTemplateModel.find();
+}
+
+export async function getPromptTemplateById(id: string) {
+  return await PublicPromptTemplateModel.findOne({ id });
+}
+
+export async function deletePromptTemplate(id: string) {
+  const deleted = await PublicPromptTemplateModel.findOneAndDelete({ id });
+  return deleted;
+}

@@ -139,7 +139,8 @@ describe('Template Engine', () => {
 			expect(mockTemplates[0].save).toHaveBeenCalled()
 			expect(mockTemplates[1].save).toHaveBeenCalled()
 			expect(result).toEqual({
-				updatedCount: mockTemplates.length,
+				total: mockTemplates.length,
+				updated: mockTemplates.length,
 				updatedIds: mockTemplates.map((t) => t.id),
 			})
 		})
