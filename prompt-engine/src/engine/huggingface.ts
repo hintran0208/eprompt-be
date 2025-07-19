@@ -15,8 +15,11 @@ const DEFAULT_CONFIG: HuggingfaceConfig ={
 };
 
 export async function getEmbedding(text: string, config: HuggingfaceConfig = DEFAULT_CONFIG): Promise<number[]> {
-  console.log(`HuggingFace API request to ${config.apiHost}${config.model}${config.postFix} with text: ${text}`);
-  const response = await fetch(`${config.apiHost}${config.model}${config.postFix}`, {
+  const url = `${config.apiHost}${config.model}${config.postFix}`;
+
+  console.log(`HuggingFace API request to ${url} with text: ${text}`);
+  
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer hf_${config.apiKey}`,
