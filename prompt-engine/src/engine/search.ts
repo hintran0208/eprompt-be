@@ -1,28 +1,5 @@
-import { BaseTemplate, PromptContext } from "./types";
 import { getEmbedding } from './huggingface';
 import PublicPromptTemplateModel from '../models/PromptTemplate';
-
-export async function generateSearch(
-    query: BaseTemplate,
-    options: PromptContext
-): Promise<{
-    results: object[];
-    metadata?: Record<string, any>;
-}> {
-    // placeholder
-    return {
-        results: [
-            {
-                text: "result",
-                score: 0.8,
-            },
-            {
-                text: "result2",
-                score: 0.78,
-            },
-        ],
-    };
-}
 
 export const semanticSearch = async (query: string, limit: number = 10) => {
     const embedding = await getEmbedding(query);

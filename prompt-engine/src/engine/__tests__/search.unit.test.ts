@@ -1,5 +1,5 @@
 import { describe, it, expect, jest, afterEach } from '@jest/globals'
-import { generateSearch, semanticSearch } from '../search'
+import { semanticSearch } from '../search'
 import PublicPromptTemplateModel from '../../models/PromptTemplate'
 import { getEmbedding } from '../huggingface'
 
@@ -10,20 +10,6 @@ const mockedGetEmbedding = getEmbedding as jest.Mock<any>
 const mockedAggregate = PublicPromptTemplateModel.aggregate as jest.Mock<any>
 
 describe('search module', () => {
-	const query = {
-		text: 'Search query',
-		description: 'Search test',
-		createdAt: new Date(),
-		updatedAt: new Date(),
-	}
-
-	const options = { topK: 1 }
-
-	it('search prompt with query', async () => {
-		const result = await generateSearch(query, options)
-		expect(Array.isArray(result.results)).toBe(true)
-	})
-
 	afterEach(() => {
 		jest.clearAllMocks()
 	})

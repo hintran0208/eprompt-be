@@ -9,7 +9,7 @@ jest.mock("../search", () => ({
   generateSearch: jest.fn(),
 }));
 
-const { semanticSearch, generateSearch } = require("../search");
+const { semanticSearch } = require("../search");
 
 const app = express();
 app.use(express.json());
@@ -21,52 +21,10 @@ describe("Search API", () => {
   });
 
   describe("POST /search/", () => {
-    it("should return search results", async () => {
-      generateSearch.mockResolvedValue({ results: [{ id: "1" }] });
-      const res = await request(app)
-        .post("/search/")
-        .send({
-          query: { text: "test query" },
-          options: { topK: 5 }
-        });
-      expect(res.status).toBe(200);
-      expect(res.body.results[0].id).toBe("1");
-    });
-
-    it("should return 400 if missing query", async () => {
-      const res = await request(app)
-        .post("/search/")
-        .send({ options: { topK: 5 } });
-      expect(res.status).toBe(400);
-      expect(res.body.error).toBe("Missing or invalid query");
-    });
-
-    it("should return 400 if missing options", async () => {
-      const res = await request(app)
-        .post("/search/")
-        .send({ query: { text: "test" } });
-      expect(res.status).toBe(400);
-      expect(res.body.error).toBe("Missing or invalid query");
-    });
-
-    it("should return 500 on error", async () => {
-      generateSearch.mockRejectedValue(new Error("fail"));
-      const res = await request(app)
-        .post("/search/")
-        .send({
-          query: { text: "test query" },
-          options: { topK: 5 }
-        });
-      expect(res.status).toBe(500);
-      expect(res.body.error).toBe("fail");
-    });
-  });
-
-  describe("POST /search/semantic", () => {
     it("should return semantic search results", async () => {
       semanticSearch.mockResolvedValue([{ id: "abc" }]);
       const res = await request(app)
-        .post("/search/semantic")
+        .post("/search/")
         .send({ query: "test", limit: 3 });
       expect(res.status).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
@@ -75,7 +33,7 @@ describe("Search API", () => {
 
     it("should return 400 if missing query", async () => {
       const res = await request(app)
-        .post("/search/semantic")
+        .post("/search/")
         .send({});
       expect(res.status).toBe(400);
       expect(res.body.error).toBe("Missing text input");
@@ -84,7 +42,7 @@ describe("Search API", () => {
     it("should return 500 on error", async () => {
       semanticSearch.mockRejectedValue(new Error("fail"));
       const res = await request(app)
-        .post("/search/semantic")
+        .post("/search/")
         .send({ query: "test" });
       expect(res.status).toBe(500);
       expect(res.body.error).toBe("Internal server error");
