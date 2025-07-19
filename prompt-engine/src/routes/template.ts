@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 
-import { createPromptTemplate, updatePromptTemplate, updateMissingEmbeddings } from "../engine/template";
+import { createPromptTemplate, updatePromptTemplate, updateEmbeddings } from "../engine/template";
 import PublicPromptTemplateModel from "../models/PromptTemplate";
 
 const router = Router();
@@ -187,7 +187,7 @@ router.post("/update", async (req: Request, res: Response) => {
 /**
  * @swagger
  * /template/update-embedding:
- *   get:
+ *   post:
  *     summary: Update missing embeddings for prompt templates - dev only
  *     description: Regenerates and updates missing or outdated vector embeddings for all prompt templates.
  *     tags: [Prompt Templates]
@@ -208,9 +208,9 @@ router.post("/update", async (req: Request, res: Response) => {
  *       500:
  *         description: Failed to update embeddings due to server error
  */
-router.get("/update-embedding", async (req: Request, res: Response) => {
+router.post("/update-embedding", async (req: Request, res: Response) => {
   try {
-    const result = await updateMissingEmbeddings();
+    const result = await updateEmbeddings();
     res.json({ message: "Updated embeddings", ...result });
   } catch (err) {
     console.error("Error updating embeddings:", err);

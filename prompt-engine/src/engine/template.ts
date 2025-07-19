@@ -1,5 +1,5 @@
 import PublicPromptTemplateModel from "../models/PromptTemplate";
-import { getEmbedding } from "../utils/getEmbedding";
+import { getEmbedding } from "./huggingface";
 import { PromptTemplate } from "../engine/types";
 
 function textFieldsForEmbedding(template: PromptTemplate) {
@@ -27,7 +27,7 @@ export async function createPromptTemplate(data: PromptTemplate) {
     return await newTemplate.save();
 }
 
-export async function updatePromptTemplate(data: Partial<PromptTemplate> & { id: string }) {
+export async function updatePromptTemplate(data: PromptTemplate) {
     const inputText = textFieldsForEmbedding(data as PromptTemplate);
     const embedding = await getEmbedding(inputText);
   
@@ -44,35 +44,30 @@ export async function updatePromptTemplate(data: Partial<PromptTemplate> & { id:
     return updated;
 }
 
-export const updateMissingEmbeddings = async () => {
-    const templates = await PublicPromptTemplateModel.find({
-      $or: [
-        { embedding: { $exists: false } },
-        { embedding: { $size: 0 } }
-      ]
-    });
+export const updateEmbeddings = async () => {
+  const templates = await PublicPromptTemplateModel.find();
 
-    console.log(`Found ${templates.length} templates to update.`);
+  console.log(`Found ${templates.length} templates to update.`);
 
-    if (templates.length === 0) {
-      return { updatedCount: 0, updatedIds: [] };
-    }
+  if (templates.length === 0) {
+    return { updatedCount: 0, updatedIds: [] };
+  }
 
-    const updatedTemplates = [];
-  
-    for (const template of templates) {
-      const text = textFieldsForEmbedding(template);
-      const embedding = await getEmbedding(text);
+  const updatedTemplates = [];
 
-      template.embedding = embedding;
-      template.updatedAt = new Date();
-      await template.save();
-  
-      updatedTemplates.push(template.id);
-    }
-  
-    return {
-      updatedCount: updatedTemplates.length,
-      updatedIds: updatedTemplates,
-    };
+  for (const template of templates) {
+    const inputText = textFieldsForEmbedding(template);
+    const embedding = await getEmbedding(inputText);
+
+    template.embedding = embedding;
+    template.updatedAt = new Date();
+    await template.save();
+
+    updatedTemplates.push(template.id);
+  }
+
+  return {
+    updatedCount: updatedTemplates.length,
+    updatedIds: updatedTemplates,
   };
+};

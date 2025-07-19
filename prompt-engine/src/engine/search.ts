@@ -1,5 +1,5 @@
 import { BaseTemplate, PromptContext } from "./types";
-import { getEmbedding } from '../utils/getEmbedding';
+import { getEmbedding } from './huggingface';
 import PublicPromptTemplateModel from '../models/PromptTemplate';
 
 export async function generateSearch(
@@ -24,7 +24,7 @@ export async function generateSearch(
     };
 }
 
-export const semanticSearch = async (query: string, limit = 10) => {
+export const semanticSearch = async (query: string, limit: number = 10) => {
     const embedding = await getEmbedding(query);
   
     const results = await PublicPromptTemplateModel.aggregate([

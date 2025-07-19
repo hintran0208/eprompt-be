@@ -111,7 +111,7 @@ router.post("/", async (req: Request, res: Response) => {
  *               items:
  *                 $ref: '#/components/schemas/PromptTemplate'
  */
-router.post('/semantic', async (req, res) => {
+router.post('/semantic', async (req: Request, res: Response) => {
   try {
     const { query, limit } = req.body;
     if (!query) return res.status(400).json({ error: 'Missing text input' });
