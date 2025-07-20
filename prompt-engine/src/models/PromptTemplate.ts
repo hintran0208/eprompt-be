@@ -12,6 +12,7 @@ export const promptTemplateSchema = new mongoose.Schema<PromptTemplate>({
     requiredFields: { type: [String], required: true },
     optionalFields: { type: [String], default: [] },
     metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
+    embedding: { type: [Number], default: [] },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });

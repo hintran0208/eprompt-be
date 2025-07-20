@@ -1,15 +1,15 @@
 import { Router, Request, Response } from "express";
-import { generateSearch } from "../engine";
+import { semanticSearch } from "../engine/search";
 import type { PromptContext, BaseTemplate } from "../engine/types";
 
 const router = Router();
 
 /**
  * @swagger
- * /search:
+ * /search/semantic:
  *   post:
- *     summary: Semantic search
- *     description: Search from a database using natural language query
+ *     summary: Perform semantic search
+ *     description: Search for prompt templates using semantic similarity.
  *     tags: [Semantic Search]
  *     requestBody:
  *       required: true
@@ -17,68 +17,32 @@ const router = Router();
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - query
- *               - options
  *             properties:
- *               query:
- *                 $ref: '#/components/schemas/SemanticSearchTemplate'
- *               options:
- *                 $ref: '#/components/schemas/SemanticSearchOptions'
- *           example:
- *             query:
- *               text: "{{search query}}"
- *             options:
- *               topK: 5
+ *               text:
+ *                 type: string
+ *                 description: The search query text.
+ *             required:
+ *               - text
  *     responses:
  *       200:
- *         description: Successfully retrieve search result
+ *         description: Search results successfully retrieved
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 results:
- *                   type: array
- *                   items:
- *                      $ref: '#/components/schemas/SemanticSearchResult'
- *       400:
- *         description: Bad request - missing or invalid template/context
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- *       500:
- *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/PromptTemplate'
  */
-router.post("/", async (req: Request, res: Response) => {
-  const { query, options } = req.body;
-  if (!query || typeof query !== "object" ) {
-    return res.status(400).json({ error: "Missing or invalid query" });
-  }
-
-  if (!options || typeof options !== "object" ) {
-    return res.status(400).json({ error: "Missing or invalid query" });
-  }
-
+router.post('/', async (req: Request, res: Response) => {
   try {
-    // Create a proper template object with defaults
-    const promptTemplate: BaseTemplate = {
-      text: query.text,
-      description: query.description || "Semantic search query",
-      metadata: query.metadata || {},
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const { query, limit } = req.body;
+    if (!query) return res.status(400).json({ error: 'Missing text input' });
 
-    const output = await generateSearch(promptTemplate, options as PromptContext);
-    res.json(output);
-  } catch (err) {
-    res.status(500).json({ error: err instanceof Error ? err.message : "Internal error" });
+    const results = await semanticSearch(query, limit);
+    res.json(results);
+  } catch (error) {
+    console.error('Search error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
