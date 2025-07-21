@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { semanticSearch, extractPrefix } from "../engine/search";
+import { extractPrefix, semanticSearch } from "../engine/search";
 
 const router = Router();
 
