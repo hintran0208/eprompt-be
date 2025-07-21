@@ -1,12 +1,11 @@
 import { Router, Request, Response } from "express";
-import { semanticSearch } from "../engine/search";
-import type { PromptContext, BaseTemplate } from "../engine/types";
+import { semanticSearch, extractPrefix } from "../engine/search";
 
 const router = Router();
 
 /**
  * @swagger
- * /search/semantic:
+ * /search:
  *   post:
  *     summary: Perform semantic search
  *     description: Search for prompt templates using semantic similarity.
@@ -18,11 +17,11 @@ const router = Router();
  *           schema:
  *             type: object
  *             properties:
- *               text:
+ *               query:
  *                 type: string
  *                 description: The search query text.
  *             required:
- *               - text
+ *               - query
  *     responses:
  *       200:
  *         description: Search results successfully retrieved
@@ -36,9 +35,13 @@ const router = Router();
 router.post('/', async (req: Request, res: Response) => {
   try {
     const { query, limit } = req.body;
-    if (!query) return res.status(400).json({ error: 'Missing text input' });
+    if (!query) return res.status(400).json({ error: 'Missing text input' });  
+    
+    // process query
+    const { prefix, text } = extractPrefix(query);
+    if (!text) return res.status(400).json({ error: 'Missing text input' });
 
-    const results = await semanticSearch(query, limit);
+    const results = await semanticSearch(prefix, text, limit);
     res.json(results);
   } catch (error) {
     console.error('Search error:', error);

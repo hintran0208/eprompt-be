@@ -1,10 +1,54 @@
 import { getEmbedding } from './huggingface';
 import PublicPromptTemplateModel from '../models/PromptTemplate';
+import { searchPrefix } from './types';
 
-export const semanticSearch = async (query: string, limit: number = 10) => {
+const searchPrefixObject: searchPrefix = {
+  ":default ": {
+    _id: 0,
+    id: 1,
+    name: 1,
+    description: 1,
+    template: 1,
+    role: 1,
+    tags: 1,
+    requiredFields: 1,
+    optionalFields: 1,
+    metadata: 1,
+    createdAt: 1,
+    updatedAt: 1,
+    score: { $meta: 'vectorSearchScore' },
+  },
+  ":template ": {
+    _id: 0,
+    id: 1,
+    name: 1,
+    description: 1,
+    template: 1,
+    role: 1,
+    tags: 1,
+    requiredFields: 1,
+    optionalFields: 1,
+    metadata: 1,
+    createdAt: 1,
+    updatedAt: 1,
+    score: { $meta: 'vectorSearchScore' },
+  },
+};
+
+export const extractPrefix = (query: string) => {
+  for (const prefix in searchPrefixObject) {
+      if (query.startsWith(prefix)) {
+        const text = query.slice(prefix.length).trim();
+        return { prefix, text };
+      }
+  }
+  return { prefix: ':default ', text: query }
+}
+
+export const semanticSearch = async (prefix: string, query: string, limit: number = 10) => {
     const embedding = await getEmbedding(query);
   
-    const results = await PublicPromptTemplateModel.aggregate([
+    return await PublicPromptTemplateModel.aggregate([
       {
         $vectorSearch: {
           index: 'default_vector_search_index',
@@ -15,23 +59,7 @@ export const semanticSearch = async (query: string, limit: number = 10) => {
         },
       },
       {
-        $project: {
-          _id: 0,
-          id: 1,
-          name: 1,
-          description: 1,
-          template: 1,
-          role: 1,
-          tags: 1,
-          requiredFields: 1,
-          optionalFields: 1,
-          metadata: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          score: { $meta: 'vectorSearchScore' }, // Ranking score
-        },
+        $project: searchPrefixObject[prefix],
       },
     ]);
-  
-    return results;
   };
