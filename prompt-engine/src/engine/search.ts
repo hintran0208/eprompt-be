@@ -3,7 +3,7 @@ import PublicPromptTemplateModel from '../models/PromptTemplate';
 import { searchPrefix } from './types';
 
 const searchPrefixObject: searchPrefix = {
-  ":default ": {
+  ":default ": [ PublicPromptTemplateModel, {
     _id: 0,
     id: 1,
     name: 1,
@@ -17,8 +17,8 @@ const searchPrefixObject: searchPrefix = {
     createdAt: 1,
     updatedAt: 1,
     score: { $meta: 'vectorSearchScore' },
-  },
-  ":template ": {
+  }],
+  ":template ": [ PublicPromptTemplateModel, {
     _id: 0,
     id: 1,
     name: 1,
@@ -32,7 +32,7 @@ const searchPrefixObject: searchPrefix = {
     createdAt: 1,
     updatedAt: 1,
     score: { $meta: 'vectorSearchScore' },
-  },
+  }],
 };
 
 export const extractPrefix = (query: string) => {
@@ -48,7 +48,7 @@ export const extractPrefix = (query: string) => {
 export const semanticSearch = async (prefix: string, query: string, limit: number = 10) => {
     const embedding = await getEmbedding(query);
   
-    return await PublicPromptTemplateModel.aggregate([
+    return await searchPrefixObject[prefix][0].aggregate([
       {
         $vectorSearch: {
           index: 'default_vector_search_index',
@@ -59,7 +59,7 @@ export const semanticSearch = async (prefix: string, query: string, limit: numbe
         },
       },
       {
-        $project: searchPrefixObject[prefix],
+        $project: searchPrefixObject[prefix][1],
       },
     ]);
   };
