@@ -6,7 +6,7 @@ export interface ModelConfig {
 
 const DEFAULT_CONFIG: ModelConfig ={
   apiHost: 'https://api.openai.com/v1/embeddings',
-  apiKey: process.env.EMBEDDING_API_TOKEN || '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',
+  apiKey: process.env.EMBEDDING_API_TOKEN || '',
   model: 'text-embedding-3-small',
 };
 

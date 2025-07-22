@@ -55,10 +55,6 @@
     "MONGODB_URI": {
       "description": "Uri for MongoDB connection",
       "value": "mongodb+srv://agent:agent@eprompt.gdos1r8.mongodb.net/Eprompt?retryWrites=true&w=majority&appName=Eprompt"
-    },
-    "EMBEDDING_API_TOKEN": {
-      "description": " API token for embedding generation",
-      "value": "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"
     }
   },
   "addons": [
