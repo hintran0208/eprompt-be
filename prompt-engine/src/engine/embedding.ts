@@ -6,7 +6,7 @@ export interface ModelConfig {
 
 const DEFAULT_CONFIG: ModelConfig ={
   apiHost: 'https://api.openai.com/v1/embeddings',
-  apiKey: process.env.EMBEDDING_API_TOKEN || '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',
+  apiKey: process.env.EMBEDDING_API_TOKEN || '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',
   model: 'text-embedding-3-small',
 };
 
