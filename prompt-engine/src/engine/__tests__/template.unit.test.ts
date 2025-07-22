@@ -5,11 +5,11 @@ import {
 	updateEmbeddings,
 } from '../template'
 import PublicPromptTemplateModel from '../../models/PromptTemplate'
-import { getEmbedding } from '../huggingface'
+import { getEmbedding } from '../embedding'
 import { PromptTemplate } from '../types'
 
 jest.mock('../../models/PromptTemplate')
-jest.mock('../huggingface')
+jest.mock('../embedding')
 
 const mockedGetEmbedding = (getEmbedding as unknown) as jest.Mock<any>
 const mockedFindOneAndUpdate = PublicPromptTemplateModel.findOneAndUpdate as jest.Mock<any>

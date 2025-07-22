@@ -1,16 +1,16 @@
 import PublicPromptTemplateModel from "../models/PromptTemplate";
-import { getEmbedding } from "./huggingface";
+import { getEmbedding } from "./embedding";
 import { PromptTemplate } from "../engine/types";
 
 function textFieldsForEmbedding(template: PromptTemplate) {
     return [
-      template.name,
-      template.description,
-      template.template,
-      template.role,
-      ...(template.tags || []),
-      template.id,
-    ].filter(Boolean).join(" ");
+      `name: ${template.name}`,
+      `description: ${template.description}`,
+      `template: ${template.template}`,
+      `role: ${template.role}`,
+      ...(template.tags || []).map(tag => `tag: ${tag}`),
+      `id: ${template.id}`,
+    ].filter(Boolean).join("\n");
 }
 
 export async function createPromptTemplate(data: PromptTemplate) {
