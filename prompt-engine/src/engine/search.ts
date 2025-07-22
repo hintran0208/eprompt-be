@@ -1,5 +1,7 @@
-import { getEmbedding } from './huggingface';
+import { getEmbedding } from './embedding';
 import PublicPromptTemplateModel from '../models/PromptTemplate';
+
+const THRESHOLD_SCORE = 0.6;
 
 export const semanticSearch = async (query: string, limit: number = 10) => {
     const embedding = await getEmbedding(query);
@@ -10,7 +12,7 @@ export const semanticSearch = async (query: string, limit: number = 10) => {
           index: 'default_vector_search_index',
           queryVector: embedding,
           path: 'embedding',
-          numCandidates: 100,
+          numCandidates: 10,
           limit: limit,
         },
       },
@@ -31,6 +33,11 @@ export const semanticSearch = async (query: string, limit: number = 10) => {
           score: { $meta: 'vectorSearchScore' }, // Ranking score
         },
       },
+      {
+        $match: {
+          score: { $gt: THRESHOLD_SCORE }
+        }
+      }
     ]);
   
     return results;
