@@ -1,10 +1,10 @@
 import { describe, it, expect, jest, afterEach } from '@jest/globals'
 import { extractPrefix, semanticSearch } from '../search'
 import PublicPromptTemplateModel from '../../models/PromptTemplate'
-import { getEmbedding } from '../huggingface'
+import { getEmbedding } from '../embedding'
 
 jest.mock('../../models/PromptTemplate')
-jest.mock('../huggingface')
+jest.mock('../embedding')
 
 const mockedGetEmbedding = getEmbedding as jest.Mock<any>
 const mockedAggregate = PublicPromptTemplateModel.aggregate as jest.Mock<any>
@@ -64,6 +64,9 @@ describe('search module', () => {
 				}),
 				expect.objectContaining({
 					$project: expect.any(Object),
+				}),
+				expect.objectContaining({
+					$match: expect.any(Object),
 				}),
 			])
 			expect(results).toEqual(mockResults)

@@ -1,6 +1,8 @@
-import { getEmbedding } from './huggingface';
+import { getEmbedding } from './embedding';
 import PublicPromptTemplateModel from '../models/PromptTemplate';
 import { searchPrefix } from './types';
+
+const THRESHOLD_SCORE = 0.6;
 
 const searchPrefixObject: searchPrefix = {
   ":default ": [ PublicPromptTemplateModel, {
@@ -54,12 +56,17 @@ export const semanticSearch = async (prefix: string, query: string, limit: numbe
           index: 'default_vector_search_index',
           queryVector: embedding,
           path: 'embedding',
-          numCandidates: 100,
+          numCandidates: 10,
           limit: limit,
         },
       },
       {
         $project: searchPrefixObject[prefix][1],
       },
+      {
+        $match: {
+          score: { $gt: THRESHOLD_SCORE }
+        }
+      }
     ]);
   };

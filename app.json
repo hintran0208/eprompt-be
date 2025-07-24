@@ -55,10 +55,6 @@
     "MONGODB_URI": {
       "description": "Uri for MongoDB connection",
       "value": "mongodb+srv://agent:agent@eprompt.gdos1r8.mongodb.net/Eprompt?retryWrites=true&w=majority&appName=Eprompt"
-    },
-    "HF_API_TOKEN": {
-      "description": "Hugging Face API token for embedding generation",
-      "value": "VTCTAYVOMSIUDyaYIRvFtZSqOMbhaPykrN"
     }
   },
   "addons": [
