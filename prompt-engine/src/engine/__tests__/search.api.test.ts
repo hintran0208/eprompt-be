@@ -6,7 +6,7 @@ import router from "../../routes/search";
 
 jest.mock("../search", () => ({
   semanticSearch: jest.fn(),
-  generateSearch: jest.fn(),
+  extractPrefix: jest.fn(() => ({ prefix: ":default ", text: "test" })),
 }));
 
 const { semanticSearch } = require("../search");

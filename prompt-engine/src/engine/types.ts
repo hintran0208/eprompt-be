@@ -1,13 +1,5 @@
 // Core types for PromptVerse
 
-export type BaseTemplate = {
-  text: string;
-  description: string;
-  metadata?: Record<string, any>;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export type PromptTemplate = {
   id: string;
   name: string;
@@ -80,3 +72,5 @@ export type TemplateFilter = {
 };
 
 export type RefinerAction = 'make-concise' | 'make-friendly' | 'make-formal' | 'add-examples' | 'simplify';
+
+export type searchPrefix = { [key: string]: Record<string, any> }
