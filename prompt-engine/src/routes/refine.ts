@@ -186,7 +186,7 @@ router.get("/types", (req: Request, res: Response) => {
  */
 // POST /refine/prompt - Refine a prompt using AI
 router.post("/prompt", async (req: Request, res: Response) => {
-  const { prompt, refinementType = "specific", modelConfig } = req.body;
+  const { prompt, refinementType = "specific", vaultId, modelConfig } = req.body;
 
   if (typeof prompt !== "string") {
     return res.status(400).json({ error: "Missing or invalid prompt" });
@@ -201,7 +201,7 @@ router.post("/prompt", async (req: Request, res: Response) => {
   }
 
   try {
-    const result = await refinePrompt(prompt, refinementType, modelConfig as ModelConfig);
+    const result = await refinePrompt(prompt, refinementType, vaultId, modelConfig as ModelConfig);
     res.json(result);
   } catch (err) {
     if (err instanceof Error && err.message.includes("Unknown prompt refinement type")) {
@@ -287,7 +287,7 @@ router.post("/prompt", async (req: Request, res: Response) => {
  */
 // POST /refine/content - Refine content using AI
 router.post("/content", async (req: Request, res: Response) => {
-  const { content, refinementType = "clarity", modelConfig } = req.body;
+  const { content, refinementType = "clarity", vaultId, modelConfig } = req.body;
 
   if (typeof content !== "string") {
     return res.status(400).json({ error: "Missing or invalid content" });
@@ -302,7 +302,7 @@ router.post("/content", async (req: Request, res: Response) => {
   }
 
   try {
-    const result = await refineContent(content, refinementType, modelConfig as ModelConfig);
+    const result = await refineContent(content, refinementType, vaultId,  modelConfig as ModelConfig);
     res.json(result);
   } catch (err) {
     if (err instanceof Error && err.message.includes("Unknown content refinement type")) {

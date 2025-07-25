@@ -13,7 +13,7 @@ function textFieldsForEmbedding(template: PromptTemplate) {
     ].filter(Boolean).join("\n");
 }
 
-export async function createPromptTemplate(data: PromptTemplate) {
+async function createPromptTemplate(data: PromptTemplate) {
     const inputText = textFieldsForEmbedding(data);
     const embedding = await getEmbedding(inputText);
 
@@ -27,7 +27,7 @@ export async function createPromptTemplate(data: PromptTemplate) {
     return await newTemplate.save();
 }
 
-export async function updatePromptTemplate(data: PromptTemplate) {
+async function updatePromptTemplate(data: PromptTemplate) {
     const inputText = textFieldsForEmbedding(data as PromptTemplate);
     const embedding = await getEmbedding(inputText);
   
@@ -44,7 +44,7 @@ export async function updatePromptTemplate(data: PromptTemplate) {
     return updated;
 }
 
-export const updateEmbeddings = async () => {
+async function updateEmbeddings () {
   const templates = await PublicPromptTemplateModel.find();
 
   console.log(`Found ${templates.length} templates to update.`);
@@ -73,15 +73,24 @@ export const updateEmbeddings = async () => {
   };
 };
 
-export async function getAllPromptTemplates() {
+async function getAllPromptTemplates() {
   return await PublicPromptTemplateModel.find();
 }
 
-export async function getPromptTemplateById(id: string) {
+async function getPromptTemplateById(id: string) {
   return await PublicPromptTemplateModel.findOne({ id });
 }
 
-export async function deletePromptTemplate(id: string) {
+async function deletePromptTemplate(id: string) {
   const deleted = await PublicPromptTemplateModel.findOneAndDelete({ id });
   return deleted;
+}
+
+export {
+  createPromptTemplate,
+  updatePromptTemplate,
+  updateEmbeddings,
+  getAllPromptTemplates,
+  getPromptTemplateById,
+  deletePromptTemplate
 }

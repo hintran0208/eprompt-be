@@ -1,6 +1,7 @@
 import Handlebars from 'handlebars';
 import type { PromptTemplate, PromptContext, PromptOutput, ModelConfig, PromptResult } from './types';
 import { OpenAIClient, createOpenAIClient, DEFAULT_OPENAI_CONFIG } from './openai';
+import { createVaultItem } from './vault';
 
 export function extractTemplateVariables(template: string): string[] {
   const variables = new Set<string>();
@@ -46,17 +47,25 @@ export function sanitizeContext(context: PromptContext): PromptContext {
   return sanitized;
 }
 
-export function generatePrompt(template: PromptTemplate, context: PromptContext): PromptOutput {
+export async function generatePrompt(template: PromptTemplate, context: PromptContext, userId: string = 'admin'): Promise<PromptOutput> {
   try {
     const missingFields = validateRequiredFields(template.requiredFields, context);
     const sanitizedContext = sanitizeContext(context);
     const compiledTemplate = Handlebars.compile(template.template);
     const prompt = compiledTemplate(sanitizedContext);
     const contextUsed = getUsedContextFields(template.template, sanitizedContext);
+
+    const { vaultId } = await createVaultItem({
+      userId: userId || 'admin',
+      templateId: template.id,
+      initialPrompt: prompt,
+    })
+
     return {
       prompt: prompt.trim(),
       missingFields,
       contextUsed,
+      vaultId: vaultId,
       metadata: {
         templateId: template.id,
         templateName: template.name,
@@ -69,6 +78,7 @@ export function generatePrompt(template: PromptTemplate, context: PromptContext)
       prompt: '',
       missingFields: template.requiredFields,
       contextUsed: [],
+      vaultId: '',
       metadata: {
         templateId: template.id,
         templateName: template.name,
@@ -86,7 +96,7 @@ export async function generateAndRunPrompt(
   modelConfig: ModelConfig
 ): Promise<PromptResult> {
   const startTime = Date.now();
-  const promptOutput = generatePrompt(template, context);
+  const promptOutput = await generatePrompt(template, context);
   if (promptOutput.missingFields.length > 0) {
     return {
       prompt: promptOutput.prompt,
