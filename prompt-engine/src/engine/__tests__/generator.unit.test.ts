@@ -1,5 +1,9 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, jest } from '@jest/globals';
 import { generatePrompt, createTemplate } from '../generator';
+import { createVaultItem } from '../vault';
+
+jest.mock('../vault'); // Mock vault functions to avoid actual API calls
+(createVaultItem as any).mockResolvedValue({vaultId: 'test'});
 
 describe('generator module', () => {
   const template = createTemplate({
@@ -10,23 +14,23 @@ describe('generator module', () => {
     role: 'Dev'
   });
 
-  it('generates prompt with all fields', () => {
+  it('generates prompt with all fields', async () => {
     const context = { name: 'Alice', company: 'Acme' };
-    const result = generatePrompt(template, context);
+    const result = await generatePrompt(template, context);
     expect(result.prompt).toBe('Hello Alice from Acme');
     expect(result.missingFields).toEqual([]);
     expect(result.contextUsed).toEqual(['name', 'company']);
   });
 
-  it('detects missing fields', () => {
+  it('detects missing fields', async () => {
     const context = { name: 'Alice' };
-    const result = generatePrompt(template, context);
+    const result = await generatePrompt(template, context);
     expect(result.missingFields).toEqual(['company']);
   });
 
-  it('sanitizes context', () => {
+  it('sanitizes context', async () => {
     const context = { name: 'Alice {{evil}}', company: 'Acme' };
-    const result = generatePrompt(template, context);
+    const result = await generatePrompt(template, context);
     expect(result.prompt).toContain('Alice \\{\\{evil\\}\\}');
   });
 });

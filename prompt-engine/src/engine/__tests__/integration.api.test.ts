@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, jest } from '@jest/globals';
+import { describe, it, expect, jest } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
 import dotenv from 'dotenv';
@@ -7,9 +7,11 @@ import refineRoute from '../../routes/refine';
 import aiGenerateRoute from '../../routes/ai-generate';
 import { createTemplate } from '../generator';
 import { DEFAULT_OPENAI_CONFIG } from '../openai';
+import { createVaultItem, updateVaultItem } from '../vault';
 
 // Mock the refiner module functions
 jest.mock('../refiner');
+jest.mock('../vault');
 
 // Import the mocked module
 import { 
@@ -28,6 +30,7 @@ const mockGetPromptRefinementTypes = getPromptRefinementTypes as jest.MockedFunc
 const mockGetContentRefinementTypes = getContentRefinementTypes as jest.MockedFunction<typeof getContentRefinementTypes>;
 const mockPromptRefinerTools = promptRefinerTools as any;
 const mockContentRefinerTools = contentRefinerTools as any;
+const mockCreateVaultItem = createVaultItem as jest.MockedFunction<typeof createVaultItem>;
 
 // Configure the mocks for prompts with dynamic responses
 mockRefinePrompt.mockImplementation(async (prompt: string, refinementType: string = 'specific') => {
@@ -201,6 +204,7 @@ Object.defineProperty(mockContentRefinerTools, 'map', {
     }
   ])
 });
+(mockCreateVaultItem as any).mockResolvedValue({ vaultId: 'test'})
 
 dotenv.config({ path: '../../.env.example' });
 
