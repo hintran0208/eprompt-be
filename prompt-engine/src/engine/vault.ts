@@ -4,9 +4,8 @@ import { VaultItem } from './types';
 async function createVaultItem(vaultItemData: Partial<VaultItem>) {
     try {
       const vaultItem = new VaultItemModel(vaultItemData);
-      await vaultItem.save();
       console.log('VaultItem created:', vaultItem);
-      return vaultItem;
+      return await vaultItem.save();
     } catch (error) {
       console.error('Error creating VaultItem:', error);
       throw error;
@@ -51,11 +50,8 @@ async function updateVaultItem(vaultId: string, updates: Partial<VaultItem>) {
   
       Object.assign(vaultItem, updates);
       vaultItem.updatedAt = new Date();
-  
-      await vaultItem.save(); 
-      console.log('VaultItem updated:', vaultItem);
 
-      return vaultItem;
+      return await vaultItem.save();
     } catch (error) {
       console.error('Error updating VaultItem:', error);
       throw error;
@@ -86,9 +82,8 @@ async function restoreVersion(vaultId: string, version: number) {
         if (targetVersion) {
           vaultItem.refinedPrompt = targetVersion.refinedPrompt;
           vaultItem.generatedContent = targetVersion.generatedContent;
-          await vaultItem.save();
           console.log(`Restored VaultItem to version ${version}:`, vaultItem);
-          return vaultItem;
+          return await vaultItem.save();
         } else {
           console.log(`Version ${version} not found for VaultItem`);
           return null;
