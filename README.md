@@ -642,7 +642,7 @@ const template = createTemplate({
 
 // Generate a prompt
 const context = { name: "Alice", platform: "ePrompt" };
-const result = generatePrompt(template, context);
+const result = await generatePrompt(template, context);
 console.log(result.prompt); // "Hello Alice! Welcome to ePrompt."
 
 // Refine a prompt using AI

@@ -1,10 +1,12 @@
 import { generateAndRunPrompt, createTemplate } from './generator';
 import type { ModelConfig } from './types';
 import { DEFAULT_OPENAI_CONFIG } from './openai';
+import { updateVaultItem } from './vault';
 
 export async function refinePrompt(
   prompt: string,
   refinementType: string = 'specific',
+  vaultId?: string,
   modelConfig?: ModelConfig
 ): Promise<{
   refinedPrompt: string;
@@ -53,6 +55,13 @@ CRITICAL INSTRUCTIONS:
 
   const result = await generateAndRunPrompt(template, {}, config);
 
+  if (vaultId) {
+    // Update the vault item with the refined prompt
+    await updateVaultItem(vaultId, {
+      refinedPrompt: result.result.trim(),
+    });
+  }
+
   return {
     refinedPrompt: result.result.trim(),
     originalPrompt: prompt,
@@ -65,6 +74,7 @@ CRITICAL INSTRUCTIONS:
 export async function refineContent(
   content: string,
   refinementType: string = 'clarity',
+  vaultId?: string,
   modelConfig?: ModelConfig
 ): Promise<{
   refinedContent: string;
@@ -112,6 +122,13 @@ CRITICAL INSTRUCTIONS:
   });
 
   const result = await generateAndRunPrompt(template, {}, config);
+
+  if (vaultId) {
+    // Update the vault item with the refined prompt
+    await updateVaultItem(vaultId, {
+      generatedContent: result.result.trim(),
+    });
+  }
 
   return {
     refinedContent: result.result.trim(),

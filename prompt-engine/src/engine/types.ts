@@ -31,6 +31,7 @@ export type PromptOutput = {
   prompt: string;
   missingFields: string[];
   contextUsed: string[];
+  vaultId?: string;
   metadata?: Record<string, any>;
 };
 
@@ -78,5 +79,25 @@ export type TemplateFilter = {
   tags?: string[];
   search?: string;
 };
+
+export type VaultHistoryItem = {
+  refinedPrompt: string; 
+  generatedContent: string;
+  action: 'Refine Prompt' | 'Generate Content';
+  version: number;
+  updatedAt: Date;
+};
+
+export type VaultItem = {
+  userId: string;
+  vaultId: string;
+  templateId: string;
+  initialPrompt: string;
+  refinedPrompt: string;
+  generatedContent: string;
+  history: VaultHistoryItem[];
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export type RefinerAction = 'make-concise' | 'make-friendly' | 'make-formal' | 'add-examples' | 'simplify';

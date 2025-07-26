@@ -52,7 +52,7 @@ const router = Router();
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post("/", (req: Request, res: Response) => {
+router.post("/", async (req: Request, res: Response) => {
   const { template, context } = req.body;
   if (!template || typeof template !== "object" || !template.template) {
     return res.status(400).json({ error: "Missing or invalid template" });
@@ -78,7 +78,7 @@ router.post("/", (req: Request, res: Response) => {
       updatedAt: new Date(),
     };
 
-    const output = generatePrompt(promptTemplate, context as PromptContext);
+    const output = await generatePrompt(promptTemplate, context as PromptContext);
     res.json(output);
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : "Internal error" });

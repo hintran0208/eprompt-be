@@ -28,7 +28,7 @@ const greetingContext = {
   features: 'advanced AI tools'
 };
 
-const greetingResult = generatePrompt(greetingTemplate, greetingContext);
+const greetingResult = await generatePrompt(greetingTemplate, greetingContext);
 console.log('Generated Prompt:', greetingResult.prompt);
 console.log('Missing Fields:', greetingResult.missingFields);
 console.log('Context Used:', greetingResult.contextUsed);
@@ -65,7 +65,7 @@ const codeReviewContext = {
   focus_areas: 'error handling and edge cases'
 };
 
-const codeReviewResult = generatePrompt(codeReviewTemplate, codeReviewContext);
+const codeReviewResult = await generatePrompt(codeReviewTemplate, codeReviewContext);
 console.log('Generated Code Review Prompt:');
 console.log(codeReviewResult.prompt);
 console.log('');
@@ -136,7 +136,7 @@ const incompleteContext = {
   // Missing: action, deadline
 };
 
-const incompleteResult = generatePrompt(incompleteTemplate, incompleteContext);
+const incompleteResult = await generatePrompt(incompleteTemplate, incompleteContext);
 console.log('Generated Prompt:', incompleteResult.prompt);
 console.log('Missing Fields:', incompleteResult.missingFields);
 console.log('Has Required Fields:', incompleteResult.metadata?.hasRequiredFields);

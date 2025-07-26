@@ -30,7 +30,7 @@ describe.skip('e2e: Full user flow (OpenAI)', () => {
       codeSnippet: 'function sum(arr) { return arr.reduce((a, b) => a + b, 0); }'
     };
     // Generate prompt
-    const output = generatePrompt(template, context);
+    const output = await generatePrompt(template, context);
     expect(output.prompt).toContain('As a Senior Backend Developer, review the following code:');
     // Accept both raw and HTML-escaped codeSnippet
     const codeSnippetVariants = [
