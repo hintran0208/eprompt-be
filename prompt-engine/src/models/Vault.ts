@@ -4,7 +4,7 @@ import { VaultItem } from '../engine/types';
 
 const vaultItemSchema = new mongoose.Schema<VaultItem>({
     userId: { type: String, required: true, default: 'admin' },
-    vaultId: { type: String, required: true },
+    vaultId: { type: String }, // will be auto-generated
     templateId: { type: String, required: true },
     initialPrompt: { type: String, required: true },
     refinedPrompt: { type: String },

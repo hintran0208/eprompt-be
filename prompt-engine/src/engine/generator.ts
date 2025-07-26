@@ -55,17 +55,21 @@ export async function generatePrompt(template: PromptTemplate, context: PromptCo
     const prompt = compiledTemplate(sanitizedContext);
     const contextUsed = getUsedContextFields(template.template, sanitizedContext);
 
-    const { vaultId } = await createVaultItem({
-      userId: userId || 'admin',
-      templateId: template.id,
-      initialPrompt: prompt,
-    })
-
+    let vaultId = '';
+    if (!(template.id === 'refine-prompt' || template.id === 'refine-content')) {
+      const result = await createVaultItem({
+        userId: userId || 'admin',
+        templateId: template.id,
+        initialPrompt: prompt,
+      });
+      vaultId = result.vaultId;
+    }
+    
     return {
       prompt: prompt.trim(),
       missingFields,
       contextUsed,
-      vaultId: vaultId,
+      vaultId: vaultId || undefined,
       metadata: {
         templateId: template.id,
         templateName: template.name,
