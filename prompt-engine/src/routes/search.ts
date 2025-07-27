@@ -35,10 +35,10 @@ const router = Router();
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { query, limit } = req.body;
+    const { query, limit, userId } = req.body;
     if (!query) return res.status(400).json({ error: 'Missing text input' });
 
-    const results = await semanticSearch(query, limit);
+    const results = await semanticSearch(query, limit, userId);
     res.json(results);
   } catch (error) {
     console.error('Search error:', error);

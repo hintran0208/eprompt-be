@@ -22,13 +22,12 @@ describe("Search API", () => {
 
   describe("POST /search/", () => {
     it("should return semantic search results", async () => {
-      semanticSearch.mockResolvedValue([{ id: "abc" }]);
+      semanticSearch.mockResolvedValue({template: [{ id: "abc" }]});
       const res = await request(app)
         .post("/search/")
         .send({ query: "test", limit: 3 });
       expect(res.status).toBe(200);
-      expect(Array.isArray(res.body)).toBe(true);
-      expect(res.body[0].id).toBe("abc");
+      expect(res.body.template[0].id).toBe("abc");
     });
 
     it("should return 400 if missing query", async () => {
