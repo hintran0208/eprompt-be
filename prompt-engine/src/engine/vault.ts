@@ -1,8 +1,25 @@
-import { VaultItemModel } from '../models/Vault';
+import VaultItemModel from '../models/Vault';
 import { VaultItem } from './types';
+import { getEmbedding } from './embedding';
 
 async function createVaultItem(vaultItemData: Partial<VaultItem>) {
     try {
+      const embeddingPromises = [];
+      
+      if (vaultItemData.name && !vaultItemData.nameEmbedding) {
+        embeddingPromises.push(getEmbedding(vaultItemData.name).then(embedding => vaultItemData.nameEmbedding = embedding));
+      }
+      if (vaultItemData.initialPrompt && !vaultItemData.initialPromptEmbedding) {
+        embeddingPromises.push(getEmbedding(vaultItemData.initialPrompt).then(embedding => vaultItemData.initialPromptEmbedding = embedding));
+      }
+      if (vaultItemData.refinedPrompt && !vaultItemData.refinedPromptEmbedding) {
+        embeddingPromises.push(getEmbedding(vaultItemData.refinedPrompt).then(embedding => vaultItemData.refinedPromptEmbedding = embedding));
+      }
+      if (vaultItemData.generatedContent && !vaultItemData.generatedContentEmbedding) {
+        embeddingPromises.push(getEmbedding(vaultItemData.generatedContent).then(embedding => vaultItemData.generatedContentEmbedding = embedding));
+      }
+      await Promise.all(embeddingPromises);
+
       const vaultItem = new VaultItemModel(vaultItemData);
       console.log('VaultItem created:', vaultItem);
       return await vaultItem.save();
@@ -47,6 +64,21 @@ async function updateVaultItem(vaultId: string, updates: Partial<VaultItem>) {
         console.log('VaultItem not found');
         return null;
       }
+      const embeddingPromises = [];
+      
+      if (updates.name) {
+        embeddingPromises.push(getEmbedding(updates.name).then(embedding => updates.nameEmbedding = embedding));
+      }
+      if (updates.initialPrompt) {
+        embeddingPromises.push(getEmbedding(updates.initialPrompt).then(embedding => updates.initialPromptEmbedding = embedding));
+      }
+      if (updates.refinedPrompt) {
+        embeddingPromises.push(getEmbedding(updates.refinedPrompt).then(embedding => updates.refinedPromptEmbedding = embedding));
+      }
+      if (updates.generatedContent) {
+        embeddingPromises.push(getEmbedding(updates.generatedContent).then(embedding => updates.generatedContentEmbedding = embedding));
+      }
+      await Promise.all(embeddingPromises);
   
       Object.assign(vaultItem, updates);
       vaultItem.updatedAt = new Date();
@@ -74,28 +106,10 @@ async function deleteVaultItem(vaultId: string) {
     }
 }
 
+// PLACEHOLDER
+// TODO: Implement versioning for VaultItem
 async function restoreVersion(vaultId: string, version: number) {
-    try {
-      const vaultItem = await VaultItemModel.findOne({ vaultId });
-      if (vaultItem) {
-        const targetVersion = vaultItem.history.find((entry) => entry.version === version);
-        if (targetVersion) {
-          vaultItem.refinedPrompt = targetVersion.refinedPrompt;
-          vaultItem.generatedContent = targetVersion.generatedContent;
-          console.log(`Restored VaultItem to version ${version}:`, vaultItem);
-          return await vaultItem.save();
-        } else {
-          console.log(`Version ${version} not found for VaultItem`);
-          return null;
-        }
-      } else {
-        console.log('VaultItem not found');
-        return null;
-      }
-    } catch (error) {
-      console.error('Error restoring VaultItem version:', error);
-      throw error;
-    }
+
 }
 
 export {

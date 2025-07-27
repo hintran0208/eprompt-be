@@ -6,6 +6,7 @@ const vaultItemSchema = new mongoose.Schema<VaultItem>({
     userId: { type: String, required: true, default: 'admin' },
     vaultId: { type: String }, // will be auto-generated
     templateId: { type: String, required: true },
+    name: { type: String },
     initialPrompt: { type: String, required: true },
     refinedPrompt: { type: String },
     generatedContent: { type: String },
@@ -18,6 +19,10 @@ const vaultItemSchema = new mongoose.Schema<VaultItem>({
           updatedAt: { type: Date, default: Date.now },
         },
     ],
+    nameEmbedding: { type: [Number], default: [] }, // TODO: for vault: searching
+    initialPromptEmbedding: { type: [Number], default: [] }, // for initial: searching
+    refinedPromptEmbedding: { type: [Number], default: [] }, // for refined: searching
+    generatedContentEmbedding: { type: [Number], default: [] }, // for content: searching
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 
@@ -50,5 +55,6 @@ vaultItemSchema.pre('save', async function (next) {
     next();
 });
 
-export const VaultItemModel = mongoose.model<VaultItem>('VaultItem', vaultItemSchema, 'vault_items');
+const VaultItemModel = mongoose.model<VaultItem>('VaultItem', vaultItemSchema, 'vault_items');
 
+export default VaultItemModel;

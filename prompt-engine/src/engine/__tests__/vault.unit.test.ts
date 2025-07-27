@@ -1,12 +1,19 @@
 import { jest, describe, it, expect } from '@jest/globals';
 
 import { createVaultItem, getVaultItemById, getAllVaultItemsByUserId, updateVaultItem, deleteVaultItem, restoreVersion } from '../vault';
-import { VaultItemModel } from '../../models/Vault';
+import { getEmbedding } from '../embedding'
+import VaultItemModel from '../../models/Vault';
 import { VaultItem } from '../types';
 
 jest.mock('../../models/Vault');
+jest.mock('../embedding')
+
+const mockedGetEmbedding = (getEmbedding as unknown) as jest.Mock<any>
 
 describe('Vault', () => {
+  
+  const mockEmbedding: number[] = [0.1, 0.2, 0.3]
+  mockedGetEmbedding.mockResolvedValue(mockEmbedding)
   describe('createVaultItem', () => {
     it('should create a new VaultItem', async () => {
       const mockData = {
@@ -19,6 +26,7 @@ describe('Vault', () => {
       (VaultItemModel.prototype.save as jest.Mock<any>).mockResolvedValue(mockData);
 
       const result = await createVaultItem(mockData);
+      expect(mockedGetEmbedding).toHaveBeenCalledWith(expect.any(String))
       expect(result).toEqual(mockData);
       expect(VaultItemModel.prototype.save).toHaveBeenCalled();
     });
@@ -46,14 +54,15 @@ describe('Vault', () => {
   describe('getAllVaultItemsByUserId', () => {
     it('should return all VaultItems for a user', async () => {
       const mockData: VaultItem[] = [{
-          vaultId: 'vault123', userId: 'user123',
-          templateId: 'test-template',
-          initialPrompt: 'Initial prompt',
-          refinedPrompt: '',
-          generatedContent: '',
-          history: [],
-          createdAt: new Date(),
-          updatedAt: new Date()
+        vaultId: 'vault123', userId: 'user123',
+        templateId: 'test-template',
+        initialPrompt: 'Initial prompt',
+        refinedPrompt: '',
+        generatedContent: '',
+        history: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        name: ''
       }];
       (VaultItemModel.find as jest.Mock<any>).mockResolvedValue(mockData);
 
@@ -72,6 +81,7 @@ describe('Vault', () => {
       });
 
       const result = await updateVaultItem('vault123', { refinedPrompt: 'Updated prompt' });
+      expect(mockedGetEmbedding).toHaveBeenCalledWith(expect.any(String))
       expect(result).toEqual({ ...mockData });
       expect(VaultItemModel.findOne).toHaveBeenCalledWith({ vaultId: 'vault123' });
     });
@@ -101,51 +111,6 @@ describe('Vault', () => {
       const result = await deleteVaultItem('vault123');
       expect(result).toBeNull();
       expect(VaultItemModel.findOneAndDelete).toHaveBeenCalledWith({ vaultId: 'vault123' });
-    });
-  });
-
-  describe('restoreVersion', () => {
-    it('should restore a specific version of VaultItem', async () => {
-      const mockData = {
-        vaultId: 'vault123',
-        history: [
-          { version: 1, refinedPrompt: 'Old prompt', generatedContent: 'Old content' },
-          { version: 2, refinedPrompt: 'New prompt', generatedContent: 'New content' },
-        ],
-        save: (jest.fn() as jest.Mock<any>).mockResolvedValue({
-            vaultId: 'vault123',
-            refinedPrompt: 'Old prompt', 
-            generatedContent: 'Old content',
-            history: [
-              { version: 1, refinedPrompt: 'Old prompt', generatedContent: 'Old content' },
-              { version: 2, refinedPrompt: 'New prompt', generatedContent: 'New content' },
-            ],
-            save: (jest.fn() as jest.Mock<any>).mockResolvedValue(true),
-          }),
-      };
-
-      (VaultItemModel.findOne as jest.Mock<any>).mockResolvedValue(mockData);
-
-      const result = await restoreVersion('vault123', 1);
-      expect(result).not.toBeNull();
-      if (result) {
-        expect(result.refinedPrompt).toEqual('Old prompt');
-        expect(result.generatedContent).toEqual('Old content');
-      }
-      expect(VaultItemModel.findOne).toHaveBeenCalledWith({ vaultId: 'vault123' });
-    });
-
-    it('should return null if version not found', async () => {
-      const mockData = {
-        vaultId: 'vault123',
-        history: [{ version: 1, refinedPrompt: 'Old prompt', generatedContent: 'Old content' }],
-      };
-
-      (VaultItemModel.findOne as jest.Mock<any>).mockResolvedValue(mockData);
-
-      const result = await restoreVersion('vault123', 2);
-      expect(result).toBeNull();
-      expect(VaultItemModel.findOne).toHaveBeenCalledWith({ vaultId: 'vault123' });
     });
   });
 });

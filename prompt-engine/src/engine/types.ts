@@ -92,10 +92,15 @@ export type VaultItem = {
   userId: string;
   vaultId: string;
   templateId: string;
+  name: string;
   initialPrompt: string;
   refinedPrompt: string;
   generatedContent: string;
   history: VaultHistoryItem[];
+  nameEmbedding?: number[];
+  initialPromptEmbedding?: number[];
+  refinedPromptEmbedding?: number[];
+  generatedContentEmbedding?: number[];
   createdAt: Date;
   updatedAt: Date;
 }
