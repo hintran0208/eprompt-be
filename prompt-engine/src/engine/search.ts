@@ -5,22 +5,29 @@ import VaultItemModel from '../models/Vault';
 const THRESHOLD_SCORE = 0.6;
 const PREFIXES = ['template:', 'vault:', 'initial-prompt:', 'refined-prompt:', 'content:'];
 
-function extractPrefixes(query: string): { prefixes: string[], query: string } {
-  const prefixes: string[] = [];
+export function extractPrefixes(query: string): { prefixes: string[], query: string } {
+  const foundPrefixes: Set<string> = new Set();
   let remainingQuery = query;
 
-  PREFIXES.forEach(prefix => {
-    if (remainingQuery.startsWith(prefix)) {
-      prefixes.push(prefix.replace(':', ''));
-      remainingQuery = remainingQuery.slice(prefix.length).trim();
+  for (const prefix of PREFIXES) {
+    const regex = new RegExp(prefix.replace(':', '\:'), 'g');
+    if (regex.test(remainingQuery)) {
+      foundPrefixes.add(prefix);
+      // Remove all occurrences of this prefix from the query
+      remainingQuery = remainingQuery.replace(regex, '').trim();
     }
-  });
+  }
 
- 
-  const finalPrefixes = prefixes.length > 0 ? prefixes : ['template'];
+  // Normalize whitespace (replace multiple spaces with a single space)
+  remainingQuery = remainingQuery.replace(/\s+/g, ' ');
+
+  // Return prefixes in the exact order of PREFIXES, without the colon
+  const finalPrefixes = PREFIXES
+    .filter(prefix => foundPrefixes.has(prefix))
+    .map(prefix => prefix.replace(':', ''));
 
   return {
-    prefixes: finalPrefixes,
+    prefixes: finalPrefixes.length > 0 ? finalPrefixes : ['template'],
     query: remainingQuery.trim(),
   };
 }
