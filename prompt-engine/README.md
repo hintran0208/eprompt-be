@@ -117,7 +117,7 @@ const context = {
   complexity: "beginner"
 };
 
-const result = generatePrompt(template, context);
+const result = await generatePrompt(template, context);
 console.log(result.prompt);
 // Output: Fully formatted prompt with context variables substituted
 
@@ -881,7 +881,7 @@ const context = {
 };
 
 // Generate prompt with full validation
-const result = generatePrompt(template, context);
+const result = await generatePrompt(template, context);
 
 if (result.missingFields.length > 0) {
   console.error("Missing required fields:", result.missingFields);

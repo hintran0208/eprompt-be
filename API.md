@@ -755,7 +755,7 @@ npm install @eprompt/prompt-engine
 import { generatePrompt, createTemplate } from '@eprompt/prompt-engine';
 
 const template = createTemplate({...});
-const result = generatePrompt(template, context);
+const result = await generatePrompt(template, context);
 ```
 
 ### cURL Examples

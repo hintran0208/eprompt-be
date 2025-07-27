@@ -2,9 +2,11 @@ import { describe, it, expect, jest } from '@jest/globals';
 import { refinePrompt, getRefinementTypes, refinerTools } from '../refiner';
 import { DEFAULT_OPENAI_CONFIG } from '../openai';
 import { generateAndRunPrompt } from '../generator';
+import { updateVaultItem } from '../vault';
 
 // Mock the generateAndRunPrompt to avoid actual API calls in unit tests
 jest.mock('../generator');
+jest.mock('../vault');
 
 const mockGeneratedResult = {
   prompt: 'Mock prompt',
@@ -18,6 +20,7 @@ const mockGeneratedResult = {
 
 // Import and set up the mock after the module is mocked
 (generateAndRunPrompt as any).mockResolvedValue(mockGeneratedResult);
+(updateVaultItem as any).mockResolvedValue({vaultId: 'test'});
 
 describe('refiner module', () => {
   describe('getRefinementTypes', () => {
@@ -76,7 +79,7 @@ describe('refiner module', () => {
         customApiKey: DEFAULT_OPENAI_CONFIG.apiKey
       };
 
-      const result = await refinePrompt(originalPrompt, 'specific', defaultModelConfig);
+      const result = await refinePrompt(originalPrompt, 'specific', 'test', defaultModelConfig);
       expect(result.refinedPrompt).toBe('This is a refined and improved prompt with better clarity.');
     });
 

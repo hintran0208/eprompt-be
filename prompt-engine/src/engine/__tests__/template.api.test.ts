@@ -13,11 +13,10 @@ jest.mock('../template', () => ({
 	updatePromptTemplate: jest.fn(),
 	updateEmbeddings: jest.fn(),
 	deletePromptTemplate: jest.fn(),
-  getAllPromptTemplates: jest.fn(),
-  getPromptTemplateById: jest.fn(),
+	getAllPromptTemplates: jest.fn(),
+	getPromptTemplateById: jest.fn(),
 }))
 
-const PublicPromptTemplateModel = require('../../models/PromptTemplate')
 const {
 	createPromptTemplate,
 	updatePromptTemplate,

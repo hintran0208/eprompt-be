@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { createOpenAIClient, DEFAULT_OPENAI_CONFIG } from "../engine/openai";
 import type { ModelConfig } from "../engine/types";
+import { updateVaultItem } from "../engine/vault";
 
 const router = Router();
 
@@ -102,7 +103,7 @@ const router = Router();
  *               $ref: '#/components/schemas/Error'
  */
 router.post("/", async (req: Request, res: Response) => {
-  const { text, modelConfig, systemPrompt } = req.body;
+  const { text, vaultId, modelConfig, systemPrompt } = req.body;
 
   if (typeof text !== "string" || !text.trim()) {
     return res.status(400).json({ error: "Missing or invalid text - must be a non-empty string" });
@@ -148,6 +149,12 @@ router.post("/", async (req: Request, res: Response) => {
     });
 
     const latencyMs = Date.now() - startTime;
+
+    if (vaultId) {
+      await updateVaultItem(vaultId, {
+        generatedContent: completion.content,
+      });
+    }
 
     res.json({
       text: text.trim(),
