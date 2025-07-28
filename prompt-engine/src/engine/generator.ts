@@ -37,11 +37,7 @@ export function sanitizeContext(context: PromptContext): PromptContext {
   const sanitized: PromptContext = {};
   for (const [key, value] of Object.entries(context)) {
     if (value !== undefined && value !== null) {
-      const stringValue = String(value);
-      sanitized[key] = stringValue
-        .replace(/\{\{/g, '\\{\\{')
-        .replace(/\}\}/g, '\\}\\}')
-        .trim();
+      sanitized[key] = String(value).trim();
     }
   }
   return sanitized;
@@ -51,7 +47,7 @@ export async function generatePrompt(template: PromptTemplate, context: PromptCo
   try {
     const missingFields = validateRequiredFields(template.requiredFields, context);
     const sanitizedContext = sanitizeContext(context);
-    const compiledTemplate = Handlebars.compile(template.template);
+    const compiledTemplate = Handlebars.compile(template.template, { noEscape: true });
     const prompt = compiledTemplate(sanitizedContext);
     const contextUsed = getUsedContextFields(template.template, sanitizedContext);
 
