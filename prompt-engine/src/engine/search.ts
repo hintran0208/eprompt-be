@@ -121,7 +121,7 @@ export const semanticSearch = async (query: string, limit: number = 10, userId: 
         results[prefix] = await searchTemplate(embedding, limitPerPrefix);
         break;
       case 'vault':
-        results[prefix] = await searchVaultField('nameEmbedding', embedding, limitPerPrefix, userId);
+        results[prefix] = await searchVaultField('embedding', embedding, limitPerPrefix, userId);
         break;
       case 'initial-prompt':
         results[prefix] = await searchVaultField('initialPromptEmbedding', embedding, limitPerPrefix, userId);
