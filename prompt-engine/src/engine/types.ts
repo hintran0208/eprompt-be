@@ -83,7 +83,7 @@ export type TemplateFilter = {
 export type VaultHistoryItem = {
   refinedPrompt: string; 
   generatedContent: string;
-  action: 'Refine Prompt' | 'Generate Content';
+  action: 'Refine Prompt' | 'Generate Content' | 'Both';
   version: number;
   updatedAt: Date;
 };
