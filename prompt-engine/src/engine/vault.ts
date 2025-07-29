@@ -2,12 +2,16 @@ import VaultItemModel from '../models/Vault';
 import { VaultItem } from './types';
 import { getEmbedding } from './embedding';
 
+function getTextForEmbedding(vaultItem: Partial<VaultItem>): string {
+  return `Item Name:${vaultItem?.name}\nTemplate Id:${vaultItem?.templateId}\nTemplate Name:${vaultItem?.templateName}\nDescription: ${vaultItem?.description}`;
+}
+
 async function createVaultItem(vaultItemData: Partial<VaultItem>) {
     try {
       const embeddingPromises = [];
       
-      if (vaultItemData.name && !vaultItemData.nameEmbedding) {
-        embeddingPromises.push(getEmbedding(vaultItemData.name).then(embedding => vaultItemData.nameEmbedding = embedding));
+      if (vaultItemData && !vaultItemData.embedding) {
+        embeddingPromises.push(getEmbedding(getTextForEmbedding(vaultItemData)).then(embedding => vaultItemData.embedding = embedding));
       }
       if (vaultItemData.initialPrompt && !vaultItemData.initialPromptEmbedding) {
         embeddingPromises.push(getEmbedding(vaultItemData.initialPrompt).then(embedding => vaultItemData.initialPromptEmbedding = embedding));
@@ -31,7 +35,7 @@ async function createVaultItem(vaultItemData: Partial<VaultItem>) {
 
 async function getVaultItemById(vaultId: string) {
     try {
-      const vaultItem = await VaultItemModel.findOne({ vaultId }).select('-nameEmbedding -initialPromptEmbedding -refinedPromptEmbedding -generatedContentEmbedding');
+      const vaultItem = await VaultItemModel.findOne({ vaultId }).select('-embedding -initialPromptEmbedding -refinedPromptEmbedding -generatedContentEmbedding');
       if (vaultItem) {
         console.log('VaultItem found:', vaultItem);
         return vaultItem;
@@ -47,7 +51,7 @@ async function getVaultItemById(vaultId: string) {
 
 async function getAllVaultItemsByUserId(userId: string = 'admin') {
     try {
-      const vaultItems = await VaultItemModel.find({ userId }).select('-nameEmbedding -initialPromptEmbedding -refinedPromptEmbedding -generatedContentEmbedding').sort({ updatedAt: -1 });
+      const vaultItems = await VaultItemModel.find({ userId }).select('-embedding -initialPromptEmbedding -refinedPromptEmbedding -generatedContentEmbedding').sort({ updatedAt: -1 });
       console.log('All VaultItems:', vaultItems);
       return vaultItems;
     } catch (error) {
@@ -66,8 +70,8 @@ async function updateVaultItem(vaultId: string, updates: Partial<VaultItem>) {
       }
       const embeddingPromises = [];
       
-      if (updates.name) {
-        embeddingPromises.push(getEmbedding(updates.name).then(embedding => updates.nameEmbedding = embedding));
+      if (updates.name || updates.templateId || updates.templateName || updates.description) {
+        embeddingPromises.push(getEmbedding(getTextForEmbedding(updates)).then(embedding => updates.embedding = embedding));
       }
       if (updates.initialPrompt) {
         embeddingPromises.push(getEmbedding(updates.initialPrompt).then(embedding => updates.initialPromptEmbedding = embedding));

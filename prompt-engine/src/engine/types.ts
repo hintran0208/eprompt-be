@@ -99,7 +99,7 @@ export type VaultItem = {
   refinedPrompt: string;
   generatedContent: string;
   history: VaultHistoryItem[];
-  nameEmbedding?: number[];
+  embedding?: number[];
   initialPromptEmbedding?: number[];
   refinedPromptEmbedding?: number[];
   generatedContentEmbedding?: number[];

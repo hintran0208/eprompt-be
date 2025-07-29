@@ -21,7 +21,7 @@ const vaultItemSchema = new mongoose.Schema<VaultItem>({
           updatedAt: { type: Date, default: Date.now },
         },
     ],
-    nameEmbedding: { type: [Number], default: [] }, // TODO: for vault: searching
+    embedding: { type: [Number], default: [] }, // TODO: for vault: searching
     initialPromptEmbedding: { type: [Number], default: [] }, // for initial-prompt: searching
     refinedPromptEmbedding: { type: [Number], default: [] }, // for refined-prompt: searching
     generatedContentEmbedding: { type: [Number], default: [] }, // for content: searching
