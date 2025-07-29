@@ -26,7 +26,19 @@ async function createVaultItem(vaultItemData: Partial<VaultItem>) {
 
       const vaultItem = new VaultItemModel(vaultItemData);
       console.log('VaultItem created:', vaultItem);
-      return await vaultItem.save();
+      const result = await vaultItem.save();
+
+      return {
+        vaultId: result.vaultId,
+        name: result.name,
+        templateId: result.templateId,
+        templateName: result.templateName,
+        description: result.description,
+        initialPrompt: result.initialPrompt,
+        refinedPrompt: result.refinedPrompt,
+        generatedContent: result.generatedContent,
+      };
+    
     } catch (error) {
       console.error('Error creating VaultItem:', error);
       throw error;
@@ -35,10 +47,19 @@ async function createVaultItem(vaultItemData: Partial<VaultItem>) {
 
 async function getVaultItemById(vaultId: string) {
     try {
-      const vaultItem = await VaultItemModel.findOne({ vaultId }).select('-embedding -initialPromptEmbedding -refinedPromptEmbedding -generatedContentEmbedding');
-      if (vaultItem) {
-        console.log('VaultItem found:', vaultItem);
-        return vaultItem;
+      const result = await VaultItemModel.findOne({ vaultId }).select('-embedding -initialPromptEmbedding -refinedPromptEmbedding -generatedContentEmbedding');
+      if (result) {
+        console.log('VaultItem found:', result);
+      return {
+        vaultId: result.vaultId,
+        name: result.name,
+        templateId: result.templateId,
+        templateName: result.templateName,
+        description: result.description,
+        initialPrompt: result.initialPrompt,
+        refinedPrompt: result.refinedPrompt,
+        generatedContent: result.generatedContent,
+      };
       } else {
         console.log('VaultItem not found');
         return null;
@@ -51,9 +72,18 @@ async function getVaultItemById(vaultId: string) {
 
 async function getAllVaultItemsByUserId(userId: string = 'admin') {
     try {
-      const vaultItems = await VaultItemModel.find({ userId }).select('-embedding -initialPromptEmbedding -refinedPromptEmbedding -generatedContentEmbedding').sort({ updatedAt: -1 });
-      console.log('All VaultItems:', vaultItems);
-      return vaultItems;
+      const response = await VaultItemModel.find({ userId }).select('-embedding -initialPromptEmbedding -refinedPromptEmbedding -generatedContentEmbedding').sort({ updatedAt: -1 });
+      const results = response.map(result => ({
+        vaultId: result.vaultId,
+        name: result.name,
+        templateId: result.templateId,
+        templateName: result.templateName,
+        description: result.description,
+        initialPrompt: result.initialPrompt,
+        refinedPrompt: result.refinedPrompt,
+        generatedContent: result.generatedContent,
+      }))
+      return results;
     } catch (error) {
       console.error('Error fetching VaultItems:', error);
       throw error;
@@ -87,7 +117,17 @@ async function updateVaultItem(vaultId: string, updates: Partial<VaultItem>) {
       Object.assign(vaultItem, updates);
       vaultItem.updatedAt = new Date();
 
-      return await vaultItem.save();
+      const result = await vaultItem.save();
+      return {
+        vaultId: result.vaultId,
+        name: result.name,
+        templateId: result.templateId,
+        templateName: result.templateName,
+        description: result.description,
+        initialPrompt: result.initialPrompt,
+        refinedPrompt: result.refinedPrompt,
+        generatedContent: result.generatedContent,
+      };
     } catch (error) {
       console.error('Error updating VaultItem:', error);
       throw error;

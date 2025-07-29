@@ -6,11 +6,9 @@ import {
 	getAllVaultItemsByUserId,
 	updateVaultItem,
 	deleteVaultItem,
-	restoreVersion,
 } from '../vault'
 import { getEmbedding } from '../embedding'
 import VaultItemModel from '../../models/Vault'
-import { VaultItem } from '../types'
 
 jest.mock('../../models/Vault')
 jest.mock('../embedding')
@@ -18,18 +16,21 @@ jest.mock('../embedding')
 const mockedGetEmbedding = (getEmbedding as unknown) as jest.Mock<any>
 
 describe('Vault', () => {
-	const mockEmbedding: number[] = [0.1, 0.2, 0.3]
-	mockedGetEmbedding.mockResolvedValue(mockEmbedding)
+	mockedGetEmbedding.mockResolvedValue(undefined);
 	describe('createVaultItem', () => {
 		it('should create a new VaultItem', async () => {
 			const mockData = {
-				userId: 'user123',
 				vaultId: 'vault123',
 				templateId: 'template456',
+				templateName: 'Template Name',
 				initialPrompt: 'Initial prompt',
-			}
+				refinedPrompt: '',
+				generatedContent: '',
+				name: 'Vault Item 1',
+				description: 'Description 1',
+			};
 
-			;(VaultItemModel.prototype.save as jest.Mock<
+			(VaultItemModel.prototype.save as jest.Mock<
 				any
 			>).mockResolvedValue(mockData)
 
@@ -43,21 +44,21 @@ describe('Vault', () => {
 	describe('getVaultItemById', () => {
 		it('should return a VaultItem by vaultId', async () => {
 			const mockData = {
-        vaultId: 'vault123',
-        userId: 'user123',
-        templateId: 'template456',
-        initialPrompt: 'Initial prompt',
-        refinedPrompt: '',
-        generatedContent: '',
-        history: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        name: 'Vault Item 1',
-      };
-      
-      (VaultItemModel.findOne as jest.Mock<any>).mockImplementation(() => ({
-        select: jest.fn().mockResolvedValue(mockData as never),
-      }));
+				vaultId: 'vault123',
+				templateId: 'template456',
+				templateName: 'Template Name',
+				initialPrompt: 'Initial prompt',
+				refinedPrompt: '',
+				generatedContent: '',
+				name: 'Vault Item 1',
+				description: 'Description 1',
+			};
+
+			(VaultItemModel.findOne as jest.Mock<any>).mockImplementation(
+				() => ({
+					select: jest.fn().mockResolvedValue(mockData as never),
+				})
+			)
 
 			const result = await getVaultItemById('vault123')
 			expect(result).toEqual(mockData)
@@ -67,9 +68,11 @@ describe('Vault', () => {
 		})
 
 		it('should return null if VaultItem not found', async () => {
-			(VaultItemModel.findOne as jest.Mock<any>).mockImplementation(() => ({
-        select: jest.fn().mockResolvedValue(null as never),
-      }));
+			;(VaultItemModel.findOne as jest.Mock<any>).mockImplementation(
+				() => ({
+					select: jest.fn().mockResolvedValue(null as never),
+				})
+			)
 
 			const result = await getVaultItemById('vault123')
 			expect(result).toBeNull()
@@ -81,26 +84,24 @@ describe('Vault', () => {
 
 	describe('getAllVaultItemsByUserId', () => {
 		it('should return all VaultItems for a user', async () => {
-      const mockData = [
-        {
-          vaultId: 'vault123',
-          userId: 'user123',
-          templateId: 'template456',
-          initialPrompt: 'Initial prompt',
-          refinedPrompt: '',
-          generatedContent: '',
-          history: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          name: 'Vault Item 1',
-        },
-      ];
+			const mockData = [
+				{
+					vaultId: 'vault123',
+					templateId: 'template456',
+					templateName: 'Template Name',
+					initialPrompt: 'Initial prompt',
+					refinedPrompt: '',
+					generatedContent: '',
+					name: 'Vault Item 1',
+					description: 'Description 1',
+				},
+			];
 
 			(VaultItemModel.find as jest.Mock<any>).mockImplementation(() => ({
-        select: jest.fn().mockImplementation(() => ({
-          sort: jest.fn().mockResolvedValue(mockData as never),
-        })),
-      }));
+				select: jest.fn().mockImplementation(() => ({
+					sort: jest.fn().mockResolvedValue(mockData as never),
+				})),
+			}))
 
 			const result = await getAllVaultItemsByUserId('user123')
 			expect(result).toEqual(mockData)
@@ -132,7 +133,7 @@ describe('Vault', () => {
 		})
 
 		it('should return null if VaultItem not found', async () => {
-      (VaultItemModel.findOne as jest.Mock<any>).mockResolvedValue(null);
+			;(VaultItemModel.findOne as jest.Mock<any>).mockResolvedValue(null)
 
 			const result = await updateVaultItem('vault123', {
 				refinedPrompt: 'Updated prompt',
@@ -146,8 +147,8 @@ describe('Vault', () => {
 
 	describe('deleteVaultItem', () => {
 		it('should delete a VaultItem', async () => {
-			const mockData = { vaultId: 'vault123' };
-      (VaultItemModel.findOneAndDelete as jest.Mock<
+			const mockData = { vaultId: 'vault123' }
+			;(VaultItemModel.findOneAndDelete as jest.Mock<
 				any
 			>).mockResolvedValue(mockData)
 
@@ -159,7 +160,7 @@ describe('Vault', () => {
 		})
 
 		it('should return null if VaultItem not found', async () => {
-			(VaultItemModel.findOneAndDelete as jest.Mock<
+			;(VaultItemModel.findOneAndDelete as jest.Mock<
 				any
 			>).mockResolvedValue(null)
 
