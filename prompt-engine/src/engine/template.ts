@@ -74,11 +74,11 @@ async function updateEmbeddings () {
 };
 
 async function getAllPromptTemplates() {
-  return await PublicPromptTemplateModel.find();
+  return await PublicPromptTemplateModel.find().select('-embedding');
 }
 
 async function getPromptTemplateById(id: string) {
-  return await PublicPromptTemplateModel.findOne({ id });
+  return await PublicPromptTemplateModel.findOne({ id }).select('-embedding');
 }
 
 async function deletePromptTemplate(id: string) {

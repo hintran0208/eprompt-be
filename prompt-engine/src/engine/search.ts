@@ -1,6 +1,7 @@
 import { getEmbedding } from './embedding';
 import PublicPromptTemplateModel from '../models/PromptTemplate';
 import VaultItemModel from '../models/Vault';
+import { template } from 'handlebars';
 
 const THRESHOLD_SCORE = 0.6;
 const PREFIXES = ['template:', 'vault:', 'initial-prompt:', 'refined-prompt:', 'content:'];
@@ -89,6 +90,9 @@ async function searchVaultField(field: string, embedding: number[], limit: numbe
         _id: 0,
         vaultId: 1,
         name: 1,
+        description: 1,
+        templateId: 1,
+        templateName: 1,
         initialPrompt: 1,
         refinedPrompt: 1,
         generatedContent: 1,

@@ -31,7 +31,7 @@ async function createVaultItem(vaultItemData: Partial<VaultItem>) {
 
 async function getVaultItemById(vaultId: string) {
     try {
-      const vaultItem = await VaultItemModel.findOne({ vaultId });
+      const vaultItem = await VaultItemModel.findOne({ vaultId }).select('-nameEmbedding -initialPromptEmbedding -refinedPromptEmbedding -generatedContentEmbedding');
       if (vaultItem) {
         console.log('VaultItem found:', vaultItem);
         return vaultItem;
@@ -47,7 +47,7 @@ async function getVaultItemById(vaultId: string) {
 
 async function getAllVaultItemsByUserId(userId: string = 'admin') {
     try {
-      const vaultItems = await VaultItemModel.find({ userId });
+      const vaultItems = await VaultItemModel.find({ userId }).select('-nameEmbedding -initialPromptEmbedding -refinedPromptEmbedding -generatedContentEmbedding').sort({ updatedAt: -1 });
       console.log('All VaultItems:', vaultItems);
       return vaultItems;
     } catch (error) {
