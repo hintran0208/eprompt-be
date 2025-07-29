@@ -6,7 +6,9 @@ const vaultItemSchema = new mongoose.Schema<VaultItem>({
     userId: { type: String, required: true, default: 'admin' },
     vaultId: { type: String }, // will be auto-generated
     templateId: { type: String, required: true },
+    templateName: { type: String, required: true },
     name: { type: String },
+    description: { type: String },
     initialPrompt: { type: String, required: true },
     refinedPrompt: { type: String },
     generatedContent: { type: String },

@@ -43,7 +43,7 @@ export function sanitizeContext(context: PromptContext): PromptContext {
   return sanitized;
 }
 
-export async function generatePrompt(template: PromptTemplate, context: PromptContext, userId: string = 'admin'): Promise<PromptOutput> {
+export async function generatePrompt(template: PromptTemplate, context: PromptContext, vaultItem: any = { userId: 'admin'}): Promise<PromptOutput> {
   try {
     const missingFields = validateRequiredFields(template.requiredFields, context);
     const sanitizedContext = sanitizeContext(context);
@@ -51,21 +51,23 @@ export async function generatePrompt(template: PromptTemplate, context: PromptCo
     const prompt = compiledTemplate(sanitizedContext);
     const contextUsed = getUsedContextFields(template.template, sanitizedContext);
 
-    let vaultId = '';
+    let result = {};
     if (!(template.id === 'refine-prompt' || template.id === 'refine-content')) {
-      const result = await createVaultItem({
-        userId: userId || 'admin',
+      result = await createVaultItem({
+        userId: vaultItem.userId || 'admin',
         templateId: template.id,
+        templateName: template.name,
         initialPrompt: prompt,
+        name: vaultItem.name,
+        description: vaultItem.description || '',
       });
-      vaultId = result.vaultId;
     }
     
     return {
       prompt: prompt.trim(),
       missingFields,
       contextUsed,
-      vaultId: vaultId || undefined,
+      vaultItem: result || undefined,
       metadata: {
         templateId: template.id,
         templateName: template.name,
@@ -78,7 +80,7 @@ export async function generatePrompt(template: PromptTemplate, context: PromptCo
       prompt: '',
       missingFields: template.requiredFields,
       contextUsed: [],
-      vaultId: '',
+      vaultItem: undefined,
       metadata: {
         templateId: template.id,
         templateName: template.name,

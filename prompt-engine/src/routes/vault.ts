@@ -1,47 +1,7 @@
 import express, { Request, Response } from 'express';
-import { createVaultItem, getVaultItemById, getAllVaultItemsByUserId, updateVaultItem } from '../engine/vault';
+import { createVaultItem, getVaultItemById, getAllVaultItemsByUserId, updateVaultItem, deleteVaultItem} from '../engine/vault';
 
 const router = express.Router();
-
-/**
- * @swagger
- * /vault:
- *   post:
- *     summary: Create a new vault item
- *     description: Creates a new vault item with the provided data
- *     tags: [Vault]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               userId:
- *                 type: string
- *                 description: The ID of the user creating the vault item
- *               templateId:
- *                 type: string
- *                 description: The ID of the template associated with the vault item
- *               initialPrompt:
- *                 type: string
- *                 description: The initial prompt for the vault item
- *     responses:
- *       201:
- *         description: Successfully created vault item
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- */
-router.post('/add', async (req: Request, res: Response) => {
-  try {
-    const vaultItem = await createVaultItem(req.body);
-    res.status(201).json(vaultItem);
-  } catch (error : any) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 /**
  * @swagger
@@ -114,9 +74,7 @@ router.post('/update', async (req: Request, res: Response) => {
     if (!req.body.vaultId) {
       return res.status(400).json({ message: 'vaultId is required' });
     }
-    if (!req.body.refinedPrompt && !req.body.generatedContent) {
-      return res.status(400).json({ message: 'At least one of refinedPrompt or generatedContent is required' });
-    }
+
     const { vaultId } = req.body;
     const updatedVaultItem = await updateVaultItem(vaultId, req.body);
     if (updatedVaultItem) {
@@ -156,7 +114,7 @@ router.post('/update', async (req: Request, res: Response) => {
  *       201:
  *         description: Successfully created vault item
  */
-router.post('/user', async (req: Request, res: Response) => {
+router.post('/add', async (req: Request, res: Response) => {
     try {
       const { userId, templateId, initialPrompt } = req.body;
   
@@ -202,6 +160,25 @@ router.get('/user/:userId', async (req: Request, res: Response) => {
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
+});
+
+router.delete('/delete/:vaultId', async (req: Request, res: Response) => {
+  try {
+    const { vaultId } = req.params;
+
+    if (!vaultId) {
+      return res.status(400).json({ message: 'vaultId is required' });
+    }
+
+    const deletedVaultItem = await deleteVaultItem(vaultId);
+    if (deletedVaultItem) {
+      res.status(200).json({ message: 'VaultItem deleted successfully' });
+    } else {
+      res.status(404).json({ message: 'VaultItem not found' });
+    }
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 export default router;

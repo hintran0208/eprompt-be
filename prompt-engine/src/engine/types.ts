@@ -31,7 +31,7 @@ export type PromptOutput = {
   prompt: string;
   missingFields: string[];
   contextUsed: string[];
-  vaultId?: string;
+  vaultItem?: object;
   metadata?: Record<string, any>;
 };
 
@@ -92,7 +92,9 @@ export type VaultItem = {
   userId: string;
   vaultId: string;
   templateId: string;
+  templateName: string;
   name: string;
+  description?: string;
   initialPrompt: string;
   refinedPrompt: string;
   generatedContent: string;

@@ -3,6 +3,7 @@ import refineRoute from './refine';
 import searchRoute from './search';
 import aiGenerateRoute from './ai-generate';
 import templateRoute from './template';
+import vaultRoute from './vault';
 
 export default function registerRoutes(app: import('express').Express) {
   app.use('/generate', generateRoute);
@@ -10,4 +11,5 @@ export default function registerRoutes(app: import('express').Express) {
   app.use('/search', searchRoute);
   app.use('/ai-generate', aiGenerateRoute);
   app.use('/template', templateRoute);
+  app.use('/vault', vaultRoute);
 }

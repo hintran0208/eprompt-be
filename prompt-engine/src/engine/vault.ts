@@ -47,7 +47,7 @@ async function getVaultItemById(vaultId: string) {
 
 async function getAllVaultItemsByUserId(userId: string = 'admin') {
     try {
-      const vaultItems = await VaultItemModel.find({ userId });
+      const vaultItems = await VaultItemModel.find({ userId }).sort({ updatedAt: -1 });
       console.log('All VaultItems:', vaultItems);
       return vaultItems;
     } catch (error) {
